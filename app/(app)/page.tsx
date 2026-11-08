@@ -125,17 +125,34 @@ async function StreakBadge() {
 async function TodayCard() {
   await connection();
   const supabase = await createClient();
-  const { data: decks } = await supabase.from("user_decks").select("next_review_at");
+  const [{ data: decks }, { data: topics }] = await Promise.all([
+    supabase.from("user_decks").select("next_review_at"),
+    supabase.from("user_grammar").select("next_review_at"),
+  ]);
 
-  const waits = (decks ?? []).map((d) => msUntil(d.next_review_at));
-  const due = waits.filter((w) => w <= 0).length;
+  const deckWaits = (decks ?? []).map((d) => msUntil(d.next_review_at));
+  const topicWaits = (topics ?? []).map((t) => msUntil(t.next_review_at));
+  const waits = [...deckWaits, ...topicWaits];
+  const dueDecks = deckWaits.filter((w) => w <= 0).length;
+  const dueTopics = topicWaits.filter((w) => w <= 0).length;
   const nextWait = waits.length > 0 ? Math.min(...waits) : 0;
+
+  const dueText = [
+    dueDecks > 0 ? `${dueDecks} deste` : null,
+    dueTopics > 0 ? `${dueTopics} gramer konusu` : null,
+  ]
+    .filter(Boolean)
+    .join(" ve ");
 
   const content =
     waits.length === 0
       ? { title: "Bir deste seç ve başla", action: "Desteleri gör", href: "/words" }
-      : due > 0
-        ? { title: `${due} deste tekrar bekliyor`, action: "Tekrara başla", href: "/words" }
+      : dueDecks + dueTopics > 0
+        ? {
+            title: `${dueText} tekrar bekliyor`,
+            action: "Tekrara başla",
+            href: dueDecks > 0 ? "/words" : "/grammar",
+          }
         : {
             title: `Bugünlük tekrarların bitti. Sıradaki tekrar ${formatWait(nextWait)}.`,
             action: "Genel pratik yap",

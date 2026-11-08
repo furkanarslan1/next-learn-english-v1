@@ -20,6 +20,19 @@ export function scheduleNext(stage: number, now: Date = new Date()) {
   };
 }
 
+/** A grammar test counts as passed with at least this share of correct answers. */
+export const PASS_RATIO = 0.7;
+
+/** After a failed review: go one stage back and see the topic again in 3 hours. */
+export function scheduleRetry(stage: number, now: Date = new Date()) {
+  return {
+    stage: Math.max(0, Math.min(stage, LAST_STAGE) - 1),
+    next_review_at: new Date(
+      now.getTime() + REVIEW_INTERVALS_HOURS[0] * 60 * 60 * 1000,
+    ).toISOString(),
+  };
+}
+
 /** "şimdi", "3 saat sonra", "2 gün sonra" */
 export function formatWait(ms: number) {
   if (ms <= 0) return "şimdi";
