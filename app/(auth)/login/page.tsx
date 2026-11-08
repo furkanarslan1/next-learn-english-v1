@@ -22,7 +22,7 @@ async function ErrorMessage({
   if (error !== "confirmation_failed") return null;
   return (
     <p role="alert" className="text-center text-sm text-destructive">
-      Email confirmation failed. Please try again.
+      E-posta onayı başarısız oldu. Lütfen tekrar dene.
     </p>
   );
 }

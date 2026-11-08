@@ -17,13 +17,13 @@ export async function login(
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) {
-    return { error: "Email and password are required." };
+    return { error: "E-posta ve şifre gerekli." };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    return { error: "Invalid email or password." };
+    return { error: "E-posta veya şifre hatalı." };
   }
 
   redirect("/");
@@ -37,10 +37,10 @@ export async function signup(
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) {
-    return { error: "Email and password are required." };
+    return { error: "E-posta ve şifre gerekli." };
   }
   if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+    return { error: "Şifre en az 8 karakter olmalı." };
   }
 
   const origin = (await headers()).get("origin");
@@ -54,12 +54,19 @@ export async function signup(
   });
 
   if (error) {
-    return { error: error.message };
+    return {
+      error:
+        error.code === "user_already_exists"
+          ? "Bu e-posta ile zaten bir hesap var."
+          : error.code === "weak_password"
+            ? "Şifre çok zayıf. Daha güçlü bir şifre seç."
+            : "Kayıt olunamadı. Lütfen tekrar dene.",
+    };
   }
 
   // With email confirmation enabled there is no session yet.
   if (!data.session) {
-    return { message: "Check your email to confirm your account." };
+    return { message: "Hesabını onaylamak için e-postanı kontrol et." };
   }
 
   // New users pick a nickname next.
@@ -74,7 +81,7 @@ export async function setNickname(
 
   if (!NICKNAME_PATTERN.test(nickname)) {
     return {
-      error: "Use 3-20 characters: letters, numbers and underscores only.",
+      error: "Nickname 3-20 karakter olmalı: yalnızca harf, rakam ve alt çizgi.",
     };
   }
 
@@ -94,8 +101,8 @@ export async function setNickname(
     return {
       error:
         error.code === "23505"
-          ? "This nickname is already taken."
-          : "Could not save your nickname. Please try again.",
+          ? "Bu nickname zaten alınmış."
+          : "Nickname kaydedilemedi. Lütfen tekrar dene.",
     };
   }
 

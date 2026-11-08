@@ -12,9 +12,9 @@ export default function OnboardingPage() {
     <main className="flex flex-1 items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Choose your nickname</CardTitle>
+          <CardTitle>Nickname seç</CardTitle>
           <CardDescription>
-            Pick a unique nickname. You&apos;ll use it in duels.
+            Benzersiz bir nickname seç. Düellolarda bu isimle görüneceksin.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -3,23 +3,23 @@
 with seed (deck_title, category, level, deck_position, word_position, english, turkish, part_of_speech, example_en, example_tr, usage_note) as (
   values
   -- A1 · Daily Basics
-  ('Daily Basics', 'general', 'A1', 1, 1, 'book', 'kitap', 'noun', 'I read a book every night.', 'Her gece bir kitap okurum.', 'Also a verb: "to book" = rezervasyon yapmak.'),
-  ('Daily Basics', 'general', 'A1', 1, 2, 'water', 'su', 'noun', 'Can I have a glass of water?', 'Bir bardak su alabilir miyim?', 'Uncountable: "some water", "a glass of water".'),
+  ('Daily Basics', 'general', 'A1', 1, 1, 'book', 'kitap', 'noun', 'I read a book every night.', 'Her gece bir kitap okurum.', 'Fiil olarak da kullanılır: "to book" = rezervasyon yapmak.'),
+  ('Daily Basics', 'general', 'A1', 1, 2, 'water', 'su', 'noun', 'Can I have a glass of water?', 'Bir bardak su alabilir miyim?', 'Sayılamaz isimdir: "some water", "a glass of water".'),
   ('Daily Basics', 'general', 'A1', 1, 3, 'friend', 'arkadaş', 'noun', 'She is my best friend.', 'O benim en iyi arkadaşım.', '"a friend of mine" = bir arkadaşım.'),
-  ('Daily Basics', 'general', 'A1', 1, 4, 'house', 'ev', 'noun', 'They live in a big house.', 'Büyük bir evde yaşıyorlar.', '"house" is the building, "home" is where you live.'),
-  ('Daily Basics', 'general', 'A1', 1, 5, 'eat', 'yemek yemek', 'verb', 'We eat dinner at seven.', 'Akşam yemeğini yedide yeriz.', 'Irregular: eat – ate – eaten.'),
+  ('Daily Basics', 'general', 'A1', 1, 4, 'house', 'ev', 'noun', 'They live in a big house.', 'Büyük bir evde yaşıyorlar.', '"house" binayı, "home" ise yaşanılan yeri (yuvayı) anlatır.'),
+  ('Daily Basics', 'general', 'A1', 1, 5, 'eat', 'yemek yemek', 'verb', 'We eat dinner at seven.', 'Akşam yemeğini yedide yeriz.', 'Düzensiz fiil: eat – ate – eaten.'),
   -- A1 · Everyday Actions
-  ('Everyday Actions', 'general', 'A1', 2, 1, 'go', 'gitmek', 'verb', 'I go to school by bus.', 'Okula otobüsle giderim.', 'Irregular: go – went – gone.'),
-  ('Everyday Actions', 'general', 'A1', 2, 2, 'want', 'istemek', 'verb', 'I want a cup of tea.', 'Bir fincan çay istiyorum.', '"want to + verb": I want to sleep.'),
-  ('Everyday Actions', 'general', 'A1', 2, 3, 'help', 'yardım etmek', 'verb', 'Can you help me, please?', 'Bana yardım eder misin lütfen?', 'Also a noun: "Thanks for your help."'),
-  ('Everyday Actions', 'general', 'A1', 2, 4, 'buy', 'satın almak', 'verb', 'She buys fresh bread every morning.', 'Her sabah taze ekmek alır.', 'Irregular: buy – bought – bought.'),
-  ('Everyday Actions', 'general', 'A1', 2, 5, 'open', 'açmak', 'verb', 'Please open the window.', 'Lütfen pencereyi aç.', 'Also an adjective: "The shop is open."'),
+  ('Everyday Actions', 'general', 'A1', 2, 1, 'go', 'gitmek', 'verb', 'I go to school by bus.', 'Okula otobüsle giderim.', 'Düzensiz fiil: go – went – gone.'),
+  ('Everyday Actions', 'general', 'A1', 2, 2, 'want', 'istemek', 'verb', 'I want a cup of tea.', 'Bir fincan çay istiyorum.', '"want to + fiil" şeklinde kullanılır: I want to sleep.'),
+  ('Everyday Actions', 'general', 'A1', 2, 3, 'help', 'yardım etmek', 'verb', 'Can you help me, please?', 'Bana yardım eder misin lütfen?', 'İsim olarak da kullanılır: "Thanks for your help."'),
+  ('Everyday Actions', 'general', 'A1', 2, 4, 'buy', 'satın almak', 'verb', 'She buys fresh bread every morning.', 'Her sabah taze ekmek alır.', 'Düzensiz fiil: buy – bought – bought.'),
+  ('Everyday Actions', 'general', 'A1', 2, 5, 'open', 'açmak', 'verb', 'Please open the window.', 'Lütfen pencereyi aç.', 'Sıfat olarak da kullanılır: "The shop is open." (Dükkân açık.)'),
   -- A2 · Travel
   ('Travel', 'general', 'A2', 1, 1, 'ticket', 'bilet', 'noun', 'I bought two train tickets.', 'İki tren bileti aldım.', '"one-way ticket" = gidiş bileti, "return ticket" = gidiş-dönüş bileti.'),
-  ('Travel', 'general', 'A2', 1, 2, 'luggage', 'bagaj', 'noun', 'Where can I leave my luggage?', 'Bagajımı nereye bırakabilirim?', 'Uncountable. "a piece of luggage". American English: "baggage".'),
-  ('Travel', 'general', 'A2', 1, 3, 'passport', 'pasaport', 'noun', 'Don''t forget your passport.', 'Pasaportunu unutma.', 'Used at border control and airports.'),
-  ('Travel', 'general', 'A2', 1, 4, 'arrive', 'varmak', 'verb', 'The train arrives at nine.', 'Tren dokuzda varır.', 'arrive IN a city/country, arrive AT a place (station, airport).'),
-  ('Travel', 'general', 'A2', 1, 5, 'delay', 'gecikme; ertelemek', 'noun/verb', 'The flight has a two-hour delay.', 'Uçuşun iki saat rötarı var.', 'Noun: "a delay". Verb: "The storm delayed the flight."'),
+  ('Travel', 'general', 'A2', 1, 2, 'luggage', 'bagaj', 'noun', 'Where can I leave my luggage?', 'Bagajımı nereye bırakabilirim?', 'Sayılamaz isimdir: "a piece of luggage". Amerikan İngilizcesinde "baggage" da kullanılır.'),
+  ('Travel', 'general', 'A2', 1, 3, 'passport', 'pasaport', 'noun', 'Don''t forget your passport.', 'Pasaportunu unutma.', 'Sınır kontrolünde ve havalimanlarında kimlik olarak kullanılır.'),
+  ('Travel', 'general', 'A2', 1, 4, 'arrive', 'varmak', 'verb', 'The train arrives at nine.', 'Tren dokuzda varır.', 'Şehir/ülke için "arrive in", yer (istasyon, havalimanı) için "arrive at" kullanılır.'),
+  ('Travel', 'general', 'A2', 1, 5, 'delay', 'gecikme; ertelemek', 'noun/verb', 'The flight has a two-hour delay.', 'Uçuşun iki saat rötarı var.', 'İsim: "a delay" (gecikme). Fiil: "The storm delayed the flight." (ertelemek).'),
   -- B1 and B2 · adverbs and linking words
   ('Frequency & Time', 'general', 'B1', 1, 1, 'rarely', 'nadiren', 'adverb', 'He rarely eats meat.', 'O nadiren et yer.', 'Sıklık zarfıdır ve olumsuz anlam taşır, bu yüzden ''not'' ile birlikte kullanılmaz. Genelde ana fiilden önce, ''be'' fiilinden sonra gelir.'),
   ('Frequency & Time', 'general', 'B1', 1, 2, 'frequently', 'sık sık', 'adverb', 'She frequently travels for work.', 'O iş için sık sık seyahat eder.', 'Bir şeyin çok tekrarlandığını anlatır. ''often'' ile aynı anlamdadır ama daha resmidir.'),

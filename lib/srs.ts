@@ -20,12 +20,12 @@ export function scheduleNext(stage: number, now: Date = new Date()) {
   };
 }
 
-/** "now", "in 3h", "in 2d" */
+/** "şimdi", "3 saat sonra", "2 gün sonra" */
 export function formatWait(ms: number) {
-  if (ms <= 0) return "now";
+  if (ms <= 0) return "şimdi";
   const hours = Math.ceil(ms / (60 * 60 * 1000));
-  if (hours < 24) return `in ${hours}h`;
-  return `in ${Math.ceil(hours / 24)}d`;
+  if (hours < 24) return `${hours} saat sonra`;
+  return `${Math.ceil(hours / 24)} gün sonra`;
 }
 
 /** Milliseconds until an ISO timestamp (negative if it is in the past). */
