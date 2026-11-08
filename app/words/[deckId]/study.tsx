@@ -140,7 +140,10 @@ export function Study({
             )}
 
             {word.usage_note && (
-              <p className="text-sm text-muted-foreground">{word.usage_note}</p>
+              <div className="text-sm">
+                <p className="font-medium">Ne için kullanılır?</p>
+                <p className="text-muted-foreground">{word.usage_note}</p>
+              </div>
             )}
 
             <Button
