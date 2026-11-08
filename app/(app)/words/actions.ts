@@ -42,6 +42,7 @@ export async function startDeck(deckId: number) {
 /** Saves the result of one study session with a single update. */
 export async function completeSession(deckId: number, markedKnown: number[]) {
   const { supabase, user } = await requireUser();
+  await supabase.rpc("touch_streak");
 
   const [{ data: row }, { data: deckWords }] = await Promise.all([
     supabase
