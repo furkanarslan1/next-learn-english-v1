@@ -28,6 +28,9 @@ const PART_OF_SPEECH_TR: Record<string, string> = {
   adverb: "zarf",
   "noun/verb": "isim/fiil",
   preposition: "edat",
+  conjunction: "bağlaç",
+  phrase: "kalıp",
+  "phrasal verb": "deyimsel fiil",
 };
 
 export function Study({
