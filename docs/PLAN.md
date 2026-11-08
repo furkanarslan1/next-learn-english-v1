@@ -46,6 +46,12 @@ Kelime takibi desteler üzerinden yapılır.
 - Tekrar sıklığı kuralları ("ilk 3 saatte 4 oturum..." gibi) kodda sabit bir tabloda tutulur, kolay değiştirilir. Oturum başına tek güncelleme olduğu için maliyet düşük kalır.
 - Tüm sayılar (deste boyutu, eşikler, tekrar sayıları) örnektir, değiştirilebilir.
 
+#### Kategoriler
+- Desteler `category` alanıyla ayrılır: `general` (A1, A2, B1... seviyeye göre) ve `yds` (YDS kelimeleri, seviyesi yok).
+- Kelimeler ekranında seviye ve YDS sekme olarak görünür.
+- Aynı anda en fazla 3 aktif deste (`MAX_ACTIVE_DECKS`, `lib/srs.ts`). Tekrar aralıkları da orada.
+- Örnek veri `supabase/seed.sql` içinde. Gerçek kelimeler (özellikle YDS listesi) kullanıcıdan alınıp buraya eklenecek.
+
 #### "Biliyorum" işareti
 - Kullanıcı destedeki bir kelimeyi "Biliyorum" diye işaretleyebilir. Geri alınabilir.
 - İşaretli kelime tekrar oturumlarında gizlenir. Deste küçülür.
@@ -87,4 +93,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş (auth) akışı (yazıldı).
 4. Mobil öncelikli ana sayfa.
-5. Kelime seçme ve tekrar ekranı.
+5. Kelime desteleri ve kart çalışma ekranı (yazıldı). Sıradaki: isteğe bağlı testler (boşluk doldurma, doğru/yanlış), gerçek kelime listeleri.
