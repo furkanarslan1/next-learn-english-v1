@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { FiCheck, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GrammarExercise } from "@/lib/grammar";
 import { cn } from "@/lib/utils";
 import { completeGrammarTest } from "../../actions";
+
+// After an answer the next question appears on its own. The explanation stays
+// a little longer when the answer was wrong.
+const CORRECT_DELAY_MS = 1400;
+const WRONG_DELAY_MS = 3500;
 
 export function GrammarQuiz({
   topicId,
@@ -26,31 +31,40 @@ export function GrammarQuiz({
   const [isRetry, setIsRetry] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saving, startSaving] = useTransition();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const done = index >= list.length;
   const exercise = list[index];
 
-  const choose = (i: number) => {
-    if (picked !== null) return;
-    setPicked(i);
-    if (i === exercise.answer) setScore((s) => s + 1);
-    else setWrong((w) => [...w, exercise]);
-  };
-
-  const next = () => {
+  const advance = (finalScore: number) => {
     const isLast = index + 1 >= list.length;
     setIndex((i) => i + 1);
     setPicked(null);
     // Only the first full run is saved to the review schedule.
     if (isLast && !isRetry) {
       startSaving(async () => {
-        const result = await completeGrammarTest(topicId, score, list.length);
+        const result = await completeGrammarTest(topicId, finalScore, list.length);
         setSaveMessage(result.message);
       });
     }
   };
 
+  const choose = (i: number) => {
+    if (picked !== null) return;
+    setPicked(i);
+    const isCorrect = i === exercise.answer;
+    const finalScore = score + (isCorrect ? 1 : 0);
+    if (isCorrect) setScore(finalScore);
+    else setWrong((w) => [...w, exercise]);
+    timer.current = setTimeout(
+      () => advance(finalScore),
+      isCorrect ? CORRECT_DELAY_MS : WRONG_DELAY_MS,
+    );
+  };
+
   const restart = (nextList: GrammarExercise[], retry: boolean) => {
+    clearTimeout(timer.current);
     setList(nextList);
     setIndex(0);
     setPicked(null);
@@ -144,10 +158,6 @@ export function GrammarQuiz({
                 <p className="text-foreground/80">{exercise.explanation}</p>
               </div>
             </div>
-          )}
-
-          {picked !== null && (
-            <Button onClick={next}>{index + 1 >= list.length ? "Sonucu gör" : "Sonraki"}</Button>
           )}
         </CardContent>
       </Card>

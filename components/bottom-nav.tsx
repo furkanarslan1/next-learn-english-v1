@@ -34,15 +34,14 @@ export function BottomNav() {
             href={href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex h-12 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors",
+              "flex h-12 flex-1 items-center justify-center rounded-full transition-colors",
               active
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className="size-5 shrink-0" aria-hidden />
-            {active && <span>{label}</span>}
-            {!active && <span className="sr-only">{label}</span>}
+            <Icon className="size-6 shrink-0" aria-hidden />
+            <span className="sr-only">{label}</span>
           </Link>
         );
       })}

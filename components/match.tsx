@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,9 @@ import { cn } from "@/lib/utils";
 import type { MatchRound } from "@/lib/quiz";
 
 type Side = "left" | "right";
+
+// A finished round moves on by itself after a short pause.
+const ROUND_DELAY_MS = 900;
 
 // Practice only: runs in the browser, nothing is saved.
 export function Match({
@@ -27,6 +30,8 @@ export function Match({
   const [matched, setMatched] = useState<Set<number>>(new Set());
   const [flash, setFlash] = useState<{ left: number; right: number } | null>(null);
   const [mistakes, setMistakes] = useState(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   // The red "wrong" highlight disappears after a moment.
   useEffect(() => {
@@ -49,6 +54,12 @@ export function Match({
     const rightId = side === "right" ? id : selected.id;
     if (leftId === rightId) {
       setMatched((m) => new Set(m).add(id));
+      if (matched.size + 1 >= round.left.length) {
+        timer.current = setTimeout(() => {
+          setRoundIndex((i) => i + 1);
+          setMatched(new Set());
+        }, ROUND_DELAY_MS);
+      }
     } else {
       setMistakes((n) => n + 1);
       setFlash({ left: leftId, right: rightId });
@@ -57,6 +68,7 @@ export function Match({
   };
 
   const restart = () => {
+    clearTimeout(timer.current);
     router.refresh(); // new shuffle from the server
     setRoundIndex(0);
     setMatched(new Set());
@@ -124,14 +136,9 @@ export function Match({
         <div className="flex flex-col gap-2">{round.right.map((w) => item("right", w))}</div>
       </div>
       {roundDone && (
-        <Button
-          onClick={() => {
-            setRoundIndex((i) => i + 1);
-            setMatched(new Set());
-          }}
-        >
-          {roundIndex + 1 >= rounds.length ? "Sonucu gör" : "Sonraki tur"}
-        </Button>
+        <p role="status" className="text-center font-semibold text-success">
+          Tur tamamlandı!
+        </p>
       )}
     </div>
   );

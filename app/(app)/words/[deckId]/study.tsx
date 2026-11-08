@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { FiCheck, FiRotateCcw, FiX } from "react-icons/fi";
+import { FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +26,7 @@ const PART_OF_SPEECH_TR: Record<string, string> = {
   adjective: "sıfat",
   adverb: "zarf",
   "noun/verb": "isim/fiil",
+  preposition: "edat",
 };
 
 export function Study({
@@ -47,27 +48,20 @@ export function Study({
   const isSummary = index >= words.length;
   const word = words[index];
 
-  // Swipe right = "I know it" (hidden in later sessions), swipe left = "not yet".
-  const decide = (direction: SwipeDirection) => {
+  const toggleKnown = (id: number) =>
     setKnown((prev) => {
       const next = new Set(prev);
-      if (direction === "right") next.add(word.id);
-      else next.delete(word.id);
+      if (!next.delete(id)) next.add(id);
       return next;
     });
-    setIndex((i) => i + 1);
-  };
 
-  const undo = () => {
-    const previous = words[index - 1];
-    if (!previous) return;
-    setKnown((prev) => {
-      const next = new Set(prev);
-      next.delete(previous.id);
-      return next;
-    });
-    setIndex(index - 1);
-  };
+  // Swipe left = next card, swipe right = previous card.
+  const onSwipe = (direction: SwipeDirection) =>
+    setIndex((i) => Math.max(0, direction === "left" ? i + 1 : i - 1));
+
+  const goPrevious = () =>
+    isSummary ? setIndex(words.length - 1) : cardRef.current?.swipe("right");
+  const goNext = () => cardRef.current?.swipe("left");
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -144,7 +138,12 @@ export function Study({
               className="absolute inset-x-4 -bottom-2 top-3 -z-10 rounded-3xl bg-muted ring-1 ring-border"
             />
           )}
-          <SwipeCard key={word.id} ref={cardRef} onSwipe={decide}>
+          <SwipeCard
+            key={word.id}
+            ref={cardRef}
+            onSwipe={onSwipe}
+            canSwipeRight={index > 0}
+          >
             <div className="flex flex-col gap-4 p-5">
               <div>
                 <p className="text-4xl font-extrabold tracking-tight">{word.english}</p>
@@ -178,37 +177,31 @@ export function Study({
       )}
 
       {!isSummary && (
-        <p className="text-center text-xs text-muted-foreground">
-          Sağa kaydır: biliyorum · Sola kaydır: henüz değil
-        </p>
+        <>
+          <Button
+            variant={known.has(word.id) ? "default" : "outline"}
+            onClick={() => toggleKnown(word.id)}
+          >
+            <FiCheck /> {known.has(word.id) ? "Biliyorum olarak işaretlendi" : "Biliyorum"}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            Kartı sola kaydırınca sonraki, sağa kaydırınca önceki kart gelir.
+          </p>
+        </>
       )}
 
       <div className="mt-auto flex flex-col gap-3">
-        {!isSummary && (
-          <div className="grid grid-cols-[auto_1fr_1fr] gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="Geri al"
-              disabled={index === 0}
-              onClick={undo}
-            >
-              <FiRotateCcw />
-            </Button>
-            <Button variant="outline" onClick={() => cardRef.current?.swipe("left")}>
-              <FiX /> Henüz değil
-            </Button>
-            <Button onClick={() => cardRef.current?.swipe("right")}>
-              <FiCheck /> Biliyorum
-            </Button>
-          </div>
-        )}
-        {isSummary && index > 0 && (
-          <Button variant="ghost" size="sm" onClick={undo}>
-            <FiRotateCcw /> Son kartı geri al
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Önceki"
+            disabled={index === 0}
+            onClick={goPrevious}
+          >
+            <FiChevronLeft />
           </Button>
-        )}
-        <div className="flex justify-center gap-1.5">
+        <div className="flex flex-1 justify-center gap-1.5">
           {words.map((w, i) => (
             <span
               key={w.id}
@@ -219,6 +212,16 @@ export function Study({
               )}
             />
           ))}
+        </div>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Sonraki"
+            disabled={isSummary}
+            onClick={goNext}
+          >
+            <FiChevronRight />
+          </Button>
         </div>
       </div>
     </div>

@@ -53,8 +53,9 @@ Kelime takibi desteler üzerinden yapılır.
 - Örnek veri `supabase/seed.sql` içinde. YDS kelimeleri hem seviye desteleri (B1/B2) hem ayrı YDS desteleri olarak durur. Aynı kelime birden fazla desteye bağlanabilir (`deck_words`), kelime kopyalanmaz. Yeni YDS kelimeleri geldikçe seed'e eklenir.
 
 #### Kart kaydırma
-- Kart parmağı takip eder. Sağa kaydır = "Biliyorum", sola kaydır = "Henüz değil". Eşik geçilirse veya hızlı bir fiske atılırsa kart uçar, aksi halde yerine yaylanır. Butonlar ve "Geri al" da aynı işi yapar.
-- Bu, "Biliyorum" işaretinin kaydırmayla yapılmasıdır; sağa kaydırılan kelimeler sonraki oturumlarda gizlenir.
+- Kart parmağı takip eder. Sola kaydır = sonraki kart, sağa kaydır = önceki kart. Eşik geçilirse veya hızlı bir fiske atılırsa kart uçar, aksi halde yerine yaylanır. İlk kartta sağa çekmek zorlaşır.
+- "Biliyorum" kartın dışında ayrı bir butondur.
+- Testlerde ("Sonraki" butonu yok) cevap verince bir sonraki soru kendiliğinden gelir. Yanlış cevapta doğru cevap daha uzun gösterilir.
 
 #### "Biliyorum" işareti
 - Kullanıcı destedeki bir kelimeyi "Biliyorum" diye işaretleyebilir. Geri alınabilir.
