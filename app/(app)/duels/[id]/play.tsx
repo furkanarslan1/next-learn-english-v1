@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,14 +10,30 @@ type Question = { english: string; options: string[] };
 
 const now = () => performance.now();
 
-export function Play({ duelId, questions }: { duelId: string; questions: Question[] }) {
-  const [started, setStarted] = useState(false);
+export function Play({
+  duelId,
+  questions,
+  autoStart = false,
+  onAnswer,
+  onFinished,
+}: {
+  duelId: string;
+  questions: Question[];
+  /** Live mode: the countdown already happened, start right away. */
+  autoStart?: boolean;
+  /** Called after every answer with the number of answered questions. */
+  onAnswer?: (answered: number) => void;
+  /** Called once the score has been saved. */
+  onFinished?: () => void;
+}) {
+  const router = useRouter();
+  const [started, setStarted] = useState(autoStart);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [pending, startTransition] = useTransition();
   const startedAt = useRef(0);
 
-  // The timer starts when the player presses "Başla".
+  // The timer starts when the player presses "Başla" (or the live countdown ends).
   useEffect(() => {
     if (started) startedAt.current = now();
   }, [started]);
@@ -42,12 +59,17 @@ export function Play({ duelId, questions }: { duelId: string; questions: Questio
   const choose = (option: number) => {
     const next = [...answers, option];
     setAnswers(next);
+    onAnswer?.(next.length);
     if (index + 1 < questions.length) {
       setIndex(index + 1);
-    } else {
-      const elapsed = now() - startedAt.current;
-      startTransition(() => submitDuel(duelId, next, elapsed));
+      return;
     }
+    const elapsed = now() - startedAt.current;
+    startTransition(async () => {
+      await submitDuel(duelId, next, elapsed);
+      onFinished?.();
+      router.refresh(); // the page now shows the result
+    });
   };
 
   return (

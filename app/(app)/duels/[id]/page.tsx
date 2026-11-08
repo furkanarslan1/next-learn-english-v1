@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { duelOutcome, formatSeconds, OUTCOME_LABEL } from "@/lib/duel";
 import { createClient } from "@/lib/supabase/server";
-import { Play } from "./play";
+import { DuelRoom } from "./duel-room";
+import { ResultWatcher } from "./result-watcher";
 
 export default function DuelPage({ params }: PageProps<"/duels/[id]">) {
   return (
@@ -40,14 +41,24 @@ async function Duel({ params }: { params: Promise<{ id: string }> }) {
   const outcome = duelOutcome(duel);
 
   if (outcome === "my_turn") {
-    const { data } = await supabase.from("duels").select("questions").eq("id", id).single();
+    const [{ data }, { data: claims }] = await Promise.all([
+      supabase.from("duels").select("questions").eq("id", id).single(),
+      supabase.auth.getClaims(),
+    ]);
     const questions = (data?.questions ?? []) as { english: string; options: string[] }[];
+    const userId = claims?.claims.sub;
+    if (!userId) notFound();
     return (
       <div className="flex flex-col gap-4">
         <p className="text-muted-foreground">
           Rakip: <strong>{duel.opponent_nickname}</strong>
         </p>
-        <Play duelId={id} questions={questions} />
+        <DuelRoom
+          duelId={id}
+          userId={userId}
+          opponentNickname={duel.opponent_nickname}
+          questions={questions}
+        />
       </div>
     );
   }
@@ -77,7 +88,8 @@ async function Duel({ params }: { params: Promise<{ id: string }> }) {
             </p>
           </div>
         </div>
-        <Button variant="outline" nativeButton={false} render={<Link href="/duels" />}>
+        {outcome === "waiting" && <ResultWatcher duelId={id} />}
+        <Button variant="ghost" nativeButton={false} render={<Link href="/duels" />}>
           Düellolarıma dön
         </Button>
       </CardContent>

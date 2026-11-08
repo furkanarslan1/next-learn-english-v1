@@ -81,6 +81,19 @@ Kelime takibi desteler üzerinden yapılır.
 - Rakibin skoru, sen bitirene kadar gizlidir. Eşitlikte hızlı olan kazanır (süreyi istemci gönderir, bu yüzden tam güvenli değildir).
 - Maliyet notu: her düello 1 satır + 1 anahtar satırı. İleride bitmiş düelloları belirli süre sonra silen bir temizlik (pg_cron) eklenebilir.
 
+### Canlı düello (isteğe bağlı mod)
+- Varsayılan eşzamansız kalır. Canlı mod, iki oyuncu da "Canlı oyna"ya basarsa açılır.
+- Maliyet kuralları: Realtime bağlantısı sadece canlı moda girilince kurulur. Sadece Broadcast ve Presence kullanılır (veritabanı dinleme yok). Sadece "kaçıncı soruda" sayısı gönderilir. Lobide 2 dakika rakip gelmezse, düello bitince ve sayfadan çıkınca bağlantı kapanır. Bağlantı kurulamazsa normal moda dönülür.
+- Puanlama yine sunucuda `submit_duel()` ile yapılır, canlı mesajlar skor taşımaz.
+- Supabase ücretsiz plan Realtime limitleri (yaklaşık 200 eşzamanlı bağlantı, ayda 2 milyon mesaj) Dashboard → Usage'tan doğrulanmalı.
+- Presence bazen birkaç saniye geç yayılabilir; arayüz olay geldikçe güncellenir.
+
+## Günlük seri
+- `touch_streak()` kayıtlı bir etkinlik (deste oturumu, gramer testi, düello) tamamlanınca çalışır. Günler Türkiye saatine göre sayılır.
+
+## Gramer tekrarı
+- Her konunun 5 çoktan seçmeli sorusu var. Test %70 ve üstü geçilirse konu `user_grammar` ile aynı aşama takvimine göre tekrar edilir. Kalınırsa bir aşama geri gidip 3 saat sonra tekrar gelir. Tekrar zamanı gelmemişse takvim değişmez.
+
 ## 4. Expo hazırlığı
 - Tekrar aralığı ve skor gibi iş mantığı UI'dan ayrı saf fonksiyonlar olarak yazılır, mobilde de kullanılır.
 - Veri her iki platformda aynı Supabase backend'inden gelir.
@@ -107,4 +120,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş: e-posta ve şifre (yazıldı). Kayıttan sonra benzersiz nickname seçilir (büyük/küçük harf duyarsız). Google girişi şimdilik ertelendi.
 4. Mobil öncelikli ana sayfa.
-5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Sıradaki: gerçek YDS listesi, gramer için tekrar takvimi/testler, Expo.
+5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Gramer testleri, günlük seri ve canlı düello da yazıldı. Sıradaki: gerçek YDS listesi, Expo.

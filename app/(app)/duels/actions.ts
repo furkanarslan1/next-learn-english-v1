@@ -36,13 +36,13 @@ export async function submitDuel(
   duelId: string,
   answers: number[],
   timeMs: number,
-) {
+): Promise<{ ok: boolean }> {
   const supabase = await createClient();
   await supabase.rpc("touch_streak");
-  await supabase.rpc("submit_duel", {
+  const { error } = await supabase.rpc("submit_duel", {
     p_duel_id: duelId,
     p_answers: answers,
     p_time_ms: Math.round(timeMs),
   });
-  redirect(`/duels/${duelId}`);
+  return { ok: !error };
 }

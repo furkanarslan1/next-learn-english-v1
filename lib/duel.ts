@@ -1,5 +1,7 @@
 // Duel helpers. Pure functions, reusable in the Expo app.
 
+export const LIVE_FLAG = (duelId: string) => `live-duel:${duelId}`;
+
 export type DuelOutcome = "my_turn" | "waiting" | "won" | "lost" | "draw";
 
 type DuelRow = {
