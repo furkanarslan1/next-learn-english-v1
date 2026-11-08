@@ -42,6 +42,9 @@ async function Chooser({ params }: { params: Promise<{ deckId: string }> }) {
           <Button nativeButton={false} render={<Link href={`/words/${deckId}/test/fill`} />}>
             Boşluk doldurma
           </Button>
+          <Button nativeButton={false} render={<Link href={`/words/${deckId}/test/match`} />}>
+            Eşleştirme
+          </Button>
           <Button variant="outline" nativeButton={false} render={<Link href={`/words/${deckId}/test/tf`} />}>
             Doğru / Yanlış
           </Button>

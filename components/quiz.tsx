@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FiCheck, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
   normalizeAnswer,
   type FillQuestion,
@@ -22,7 +22,6 @@ export function Quiz(props: Props) {
     props.questions,
   );
   const [index, setIndex] = useState(0);
-  const [text, setText] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const [score, setScore] = useState(0);
   const [wrong, setWrong] = useState<(FillQuestion | TrueFalseQuestion)[]>([]);
@@ -38,14 +37,12 @@ export function Quiz(props: Props) {
 
   const next = () => {
     setIndex((i) => i + 1);
-    setText("");
     setResult(null);
   };
 
   const restart = (list: (FillQuestion | TrueFalseQuestion)[]) => {
     setQuestions(list);
     setIndex(0);
-    setText("");
     setResult(null);
     setScore(0);
     setWrong([]);
@@ -90,13 +87,12 @@ export function Quiz(props: Props) {
         <CardContent className="flex flex-col gap-4">
           {props.mode === "fill" ? (
             <FillView
+              key={`${index}-${question.id}`}
               question={question as FillQuestion}
-              text={text}
-              setText={setText}
               result={result}
-              onCheck={() =>
+              onCheck={(typed) =>
                 submit(
-                  normalizeAnswer(text) ===
+                  normalizeAnswer(typed) ===
                     normalizeAnswer((question as FillQuestion).answer),
                 )
               }
@@ -147,43 +143,113 @@ function ResultBanner({
   );
 }
 
+/** Letter boxes: some letters are given, the player fills in the empty boxes. */
 function FillView({
   question,
-  text,
-  setText,
   result,
   onCheck,
 }: {
   question: FillQuestion;
-  text: string;
-  setText: (v: string) => void;
   result: "correct" | "wrong" | null;
-  onCheck: () => void;
+  onCheck: (typed: string) => void;
 }) {
+  const chars = [...question.answer];
+  const blanks = chars.flatMap((_, i) => (question.mask[i] ? [] : [i]));
+
+  // typed letters by character position; `hinted` positions are filled by the hint button
+  const [typed, setTyped] = useState<Record<number, string>>({});
+  const [hinted, setHinted] = useState<Set<number>>(new Set());
+  const inputs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  const valueAt = (i: number) => (question.mask[i] ? chars[i] : (typed[i] ?? ""));
+  const complete = blanks.every((i) => (typed[i] ?? "") !== "");
+  const locked = result !== null;
+
+  const focusBlank = (i: number | undefined) => {
+    if (i !== undefined) inputs.current[i]?.focus();
+  };
+
+  const onType = (i: number, raw: string) => {
+    const letter = [...raw].pop() ?? "";
+    setTyped((t) => ({ ...t, [i]: letter }));
+    if (letter) focusBlank(blanks[blanks.indexOf(i) + 1]);
+  };
+
+  const onBackspace = (i: number) => {
+    if ((typed[i] ?? "") === "") focusBlank(blanks[blanks.indexOf(i) - 1]);
+  };
+
+  const giveHint = () => {
+    const target = blanks.find((i) => !hinted.has(i) && (typed[i] ?? "").toLowerCase() !== chars[i].toLowerCase());
+    if (target === undefined) return;
+    setTyped((t) => ({ ...t, [target]: chars[target] }));
+    setHinted((h) => new Set(h).add(target));
+  };
+
+  const submit = () => {
+    if (!locked && complete) onCheck(chars.map((_, i) => valueAt(i)).join(""));
+  };
+
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!result && text.trim()) onCheck();
+        submit();
       }}
     >
-      <p className="text-sm text-muted-foreground">İngilizcesini yaz:</p>
+      <p className="text-sm text-muted-foreground">Eksik harfleri tamamla:</p>
       <p className="text-2xl font-bold">{question.turkish}</p>
+
+      <div className="flex flex-wrap gap-1.5" aria-label="Kelime">
+        {chars.map((ch, i) =>
+          ch === " " ? (
+            <span key={i} className="w-3" aria-hidden />
+          ) : question.mask[i] ? (
+            <span
+              key={i}
+              className="flex h-11 w-9 items-center justify-center rounded-md bg-muted text-lg font-semibold"
+            >
+              {ch}
+            </span>
+          ) : (
+            <input
+              key={i}
+              ref={(el) => {
+                inputs.current[i] = el;
+              }}
+              value={typed[i] ?? ""}
+              onChange={(e) => onType(i, e.target.value)}
+              onKeyDown={(e) => e.key === "Backspace" && onBackspace(i)}
+              onFocus={(e) => e.target.select()}
+              disabled={locked || hinted.has(i)}
+              maxLength={2}
+              inputMode="text"
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoFocus={i === blanks[0]}
+              aria-label={`Harf ${i + 1}`}
+              className={cn(
+                "h-11 w-9 rounded-md border-2 border-input bg-background text-center text-lg font-semibold outline-none focus:border-ring",
+                hinted.has(i) && "border-primary/40 bg-primary/10",
+                locked &&
+                  (result === "correct"
+                    ? "border-green-500"
+                    : (typed[i] ?? "").toLowerCase() === ch.toLowerCase()
+                      ? "border-green-500"
+                      : "border-destructive"),
+              )}
+            />
+          ),
+        )}
+      </div>
+
       {question.hint && (
         <p className="rounded-md bg-muted p-3 text-sm">{question.hint}</p>
       )}
-      <Input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        disabled={result !== null}
-        autoComplete="off"
-        autoCapitalize="none"
-        autoCorrect="off"
-        spellCheck={false}
-        aria-label="Cevap"
-        autoFocus
-      />
+
       {result ? (
         <ResultBanner result={result}>
           {result === "wrong" && (
@@ -193,9 +259,14 @@ function FillView({
           )}
         </ResultBanner>
       ) : (
-        <Button type="submit" disabled={!text.trim()}>
-          Kontrol et
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button type="button" variant="outline" onClick={giveHint}>
+            İpucu
+          </Button>
+          <Button type="submit" disabled={!complete}>
+            Kontrol et
+          </Button>
+        </div>
       )}
     </form>
   );

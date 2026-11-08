@@ -30,6 +30,9 @@ export default function PracticePage() {
           <Button nativeButton={false} render={<Link href="/practice/fill" />}>
             Boşluk doldurma
           </Button>
+          <Button nativeButton={false} render={<Link href="/practice/match" />}>
+            Eşleştirme
+          </Button>
           <Button variant="outline" nativeButton={false} render={<Link href="/practice/tf" />}>
             Doğru / Yanlış
           </Button>
