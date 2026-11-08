@@ -74,6 +74,29 @@ export type Database = {
         }
         Relationships: []
       }
+      duel_answer_keys: {
+        Row: {
+          correct: number[]
+          duel_id: string
+        }
+        Insert: {
+          correct: number[]
+          duel_id: string
+        }
+        Update: {
+          correct?: number[]
+          duel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_answer_keys_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: true
+            referencedRelation: "duels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       duels: {
         Row: {
           created_at: string
@@ -87,6 +110,7 @@ export type Database = {
           opponent_score: number | null
           opponent_time_ms: number | null
           question_word_ids: number[]
+          questions: Json
           status: Database["public"]["Enums"]["duel_status"]
         }
         Insert: {
@@ -101,6 +125,7 @@ export type Database = {
           opponent_score?: number | null
           opponent_time_ms?: number | null
           question_word_ids: number[]
+          questions?: Json
           status?: Database["public"]["Enums"]["duel_status"]
         }
         Update: {
@@ -115,6 +140,7 @@ export type Database = {
           opponent_score?: number | null
           opponent_time_ms?: number | null
           question_word_ids?: number[]
+          questions?: Json
           status?: Database["public"]["Enums"]["duel_status"]
         }
         Relationships: [
@@ -319,7 +345,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_duel: {
+        Args: { p_opponent_nickname: string; p_question_count?: number }
+        Returns: string
+      }
       learn_deck: { Args: { p_deck_id: number }; Returns: undefined }
+      my_duels: {
+        Args: { p_duel_id?: string }
+        Returns: {
+          created_at: string
+          id: string
+          my_finished: boolean
+          my_score: number
+          my_time_ms: number
+          opponent_nickname: string
+          question_count: number
+          status: Database["public"]["Enums"]["duel_status"]
+          their_finished: boolean
+          their_score: number
+          their_time_ms: number
+        }[]
+      }
+      submit_duel: {
+        Args: { p_answers: number[]; p_duel_id: string; p_time_ms: number }
+        Returns: number
+      }
     }
     Enums: {
       cefr_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
