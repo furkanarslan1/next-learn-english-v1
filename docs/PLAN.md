@@ -91,6 +91,13 @@ Kelime takibi desteler üzerinden yapılır.
 - Yanlış yapılan kelimeler için ayrı tekrar listesi.
 - Boşluk doldurma testi (kalıpları cümle içinde pekiştirir).
 
+## Tema
+- Ana renk indigo (primary), vurgu amber, başarı yeşil. Renkler `app/globals.css` içinde tek yerden değişir.
+- Font: Nunito. Yuvarlak köşeler (`--radius: 1rem`), büyük dokunma alanları (buton yüksekliği 44px).
+- Açık/koyu tema sistem ayarını izler (şimdilik manuel anahtar yok).
+- Giriş yapılmış sayfalar `app/(app)` altında, ortak alt gezinme çubuğu (yüzen dock) ile.
+- Hedef kitle genel İngilizce öğrenenler. YDS sadece ayrı bir kelime bölümü.
+
 ## 6. Supabase free plan notları
 - Bir hafta aktivite olmazsa proje duraklatılır. Canlıya çıkarken Pro plana geçmek mantıklı.
 - Veritabanı limiti 500 MB. Satır sayısını yukarıdaki kurallarla düşük tutuyoruz.

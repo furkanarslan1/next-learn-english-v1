@@ -127,7 +127,7 @@ export function Study({
         </Card>
       ) : (
         <Card
-          className="touch-pan-y select-none"
+          className="touch-pan-y select-none rounded-3xl"
           onPointerDown={(e) => (startX.current = e.clientX)}
           onPointerUp={(e) => {
             if (startX.current === null) return;
@@ -140,7 +140,7 @@ export function Study({
           <CardContent className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-3xl font-bold">{word.english}</p>
+                <p className="text-4xl font-extrabold tracking-tight">{word.english}</p>
                 {word.part_of_speech && (
                   <Badge variant="outline" className="mt-2">
                     {PART_OF_SPEECH_TR[word.part_of_speech] ?? word.part_of_speech}
@@ -149,10 +149,10 @@ export function Study({
               </div>
             </div>
 
-            <p className="text-xl">{word.turkish}</p>
+            <p className="text-xl font-bold text-primary">{word.turkish}</p>
 
             {word.example_en && (
-              <div className="rounded-md bg-muted p-3 text-sm">
+              <div className="rounded-xl border-l-4 border-amber bg-amber/10 p-3 text-sm">
                 <p>{word.example_en}</p>
                 {word.example_tr && (
                   <p className="mt-1 text-muted-foreground">{word.example_tr}</p>
