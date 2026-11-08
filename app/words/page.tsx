@@ -19,6 +19,15 @@ export default function WordsPage() {
           <FiArrowLeft />
         </Button>
         <h1 className="text-xl font-semibold">Kelime öğren</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto"
+          nativeButton={false}
+          render={<Link href="/practice" />}
+        >
+          Genel pratik
+        </Button>
       </header>
       <Suspense fallback={<p className="text-sm text-muted-foreground">Desteler yükleniyor…</p>}>
         <Decks />

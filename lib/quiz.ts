@@ -71,3 +71,8 @@ export function buildTrueFalseQuestions(words: QuizWord[]): TrueFalseQuestion[] 
     };
   });
 }
+
+/** Picks up to `count` random items. */
+export function pickRandom<T>(items: T[], count: number): T[] {
+  return shuffle(items).slice(0, count);
+}

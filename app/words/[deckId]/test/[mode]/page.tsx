@@ -6,7 +6,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { buildFillQuestions, buildTrueFalseQuestions } from "@/lib/quiz";
 import { createClient } from "@/lib/supabase/server";
-import { Quiz } from "./quiz";
+import { Quiz } from "@/components/quiz";
 
 export default function TestPage({
   params,
@@ -58,9 +58,19 @@ async function QuizLoader({
         </h1>
       </header>
       {mode === "fill" ? (
-        <Quiz mode="fill" deckId={deckId} questions={buildFillQuestions(words)} />
+        <Quiz
+          mode="fill"
+          backHref={`/words/${deckId}`}
+          backLabel="Desteye dön"
+          questions={buildFillQuestions(words)}
+        />
       ) : (
-        <Quiz mode="tf" deckId={deckId} questions={buildTrueFalseQuestions(words)} />
+        <Quiz
+          mode="tf"
+          backHref={`/words/${deckId}`}
+          backLabel="Desteye dön"
+          questions={buildTrueFalseQuestions(words)}
+        />
       )}
     </>
   );
