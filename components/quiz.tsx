@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiCheck, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,11 @@ type Props =
   | { mode: "fill"; backHref: string; backLabel: string; questions: FillQuestion[] }
   | { mode: "tf"; backHref: string; backLabel: string; questions: TrueFalseQuestion[] };
 
+// After an answer the next question appears on its own. A wrong answer stays
+// longer so the correct answer can be read.
+const CORRECT_DELAY_MS = 800;
+const WRONG_DELAY_MS = 2200;
+
 // Practice only: everything runs in the browser, nothing is saved.
 export function Quiz(props: Props) {
   const [questions, setQuestions] = useState<(FillQuestion | TrueFalseQuestion)[]>(
@@ -29,18 +34,23 @@ export function Quiz(props: Props) {
   const done = index >= questions.length;
   const question = questions[index];
 
-  const submit = (isCorrect: boolean) => {
-    setResult(isCorrect ? "correct" : "wrong");
-    if (isCorrect) setScore((s) => s + 1);
-    else setWrong((w) => [...w, question]);
-  };
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const next = () => {
     setIndex((i) => i + 1);
     setResult(null);
   };
 
+  const submit = (isCorrect: boolean) => {
+    setResult(isCorrect ? "correct" : "wrong");
+    if (isCorrect) setScore((s) => s + 1);
+    else setWrong((w) => [...w, question]);
+    timer.current = setTimeout(next, isCorrect ? CORRECT_DELAY_MS : WRONG_DELAY_MS);
+  };
+
   const restart = (list: (FillQuestion | TrueFalseQuestion)[]) => {
+    clearTimeout(timer.current);
     setQuestions(list);
     setIndex(0);
     setResult(null);
@@ -105,12 +115,6 @@ export function Quiz(props: Props) {
                 submit(value === (question as TrueFalseQuestion).isTrue)
               }
             />
-          )}
-
-          {result && (
-            <Button onClick={next}>
-              {index + 1 >= questions.length ? "Sonucu gör" : "Sonraki"}
-            </Button>
           )}
         </CardContent>
       </Card>
