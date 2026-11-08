@@ -50,7 +50,7 @@ Kelime takibi desteler üzerinden yapılır.
 - Desteler `category` alanıyla ayrılır: `general` (A1, A2, B1... seviyeye göre) ve `yds` (YDS kelimeleri, seviyesi yok).
 - Kelimeler ekranında seviye ve YDS sekme olarak görünür.
 - Aynı anda en fazla 3 aktif deste (`MAX_ACTIVE_DECKS`, `lib/srs.ts`). Tekrar aralıkları da orada.
-- Örnek veri `supabase/seed.sql` içinde. YDS kelimeleri hem seviye desteleri (B1/B2) hem ayrı YDS desteleri olarak durur. Aynı kelime birden fazla desteye bağlanabilir (`deck_words`), kelime kopyalanmaz. Yeni YDS kelimeleri geldikçe seed'e eklenir.
+- Örnek veri `supabase/seed.sql` içinde. YDS kelimeleri hem seviye desteleri (B1/B2) hem ayrı YDS desteleri olarak durur. Aynı kelime birden fazla desteye bağlanabilir (`deck_words`), kelime kopyalanmaz. Kullanıcının verdiği kelimelerin hepsi YDS kelimesidir: her biri hem seviye destesine hem ayrı YDS destesine eklenir. "Gerçek YDS listesi" diye bekleyen ayrı bir liste yoktur.
 
 #### Kart kaydırma
 - Kart parmağı takip eder. Sola kaydır = sonraki kart, sağa kaydır = önceki kart. Eşik geçilirse veya hızlı bir fiske atılırsa kart uçar, aksi halde yerine yaylanır. İlk kartta sağa çekmek zorlaşır.
@@ -125,4 +125,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş: e-posta ve şifre (yazıldı). Kayıttan sonra benzersiz nickname seçilir (büyük/küçük harf duyarsız). Google girişi şimdilik ertelendi.
 4. Mobil öncelikli ana sayfa.
-5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Gramer testleri, günlük seri ve canlı düello da yazıldı. Sıradaki: gerçek YDS listesi, Expo.
+5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Gramer testleri, günlük seri ve canlı düello da yazıldı. Sıradaki: yeni kelimeler geldikçe ekleme, Expo.
