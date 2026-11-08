@@ -322,6 +322,7 @@ export type Database = {
           id: number
           level: Database["public"]["Enums"]["cefr_level"] | null
           part_of_speech: string | null
+          synonyms: string[]
           turkish: string
           usage_note: string | null
         }
@@ -333,6 +334,7 @@ export type Database = {
           id?: never
           level?: Database["public"]["Enums"]["cefr_level"] | null
           part_of_speech?: string | null
+          synonyms?: string[]
           turkish: string
           usage_note?: string | null
         }
@@ -344,6 +346,7 @@ export type Database = {
           id?: never
           level?: Database["public"]["Enums"]["cefr_level"] | null
           part_of_speech?: string | null
+          synonyms?: string[]
           turkish?: string
           usage_note?: string | null
         }
