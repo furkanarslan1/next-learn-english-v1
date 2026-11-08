@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { connection } from "next/server";
 import { FiArrowLeft } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { msUntil } from "@/lib/srs";
@@ -11,7 +12,7 @@ export default function DeckPage({ params }: PageProps<"/words/[deckId]">) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4">
       <header className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" render={<Link href="/words" aria-label="Back" />}>
+        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/words" aria-label="Back" />}>
           <FiArrowLeft />
         </Button>
       </header>
@@ -23,6 +24,7 @@ export default function DeckPage({ params }: PageProps<"/words/[deckId]">) {
 }
 
 async function Deck({ params }: { params: Promise<{ deckId: string }> }) {
+  await connection(); // session + time checks must run at request time
   const deckId = Number((await params).deckId);
   if (!Number.isInteger(deckId)) notFound();
 

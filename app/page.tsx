@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { FiBookOpen, FiLogOut, FiZap } from "react-icons/fi";
 import { MdOutlineSpellcheck } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,8 @@ export default function HomePage() {
 }
 
 async function Greeting() {
+  // Reads the session (uses the current time), so render at request time only.
+  await connection();
   const supabase = await createClient();
   const { data: profile } = await supabase
     .from("profiles")
