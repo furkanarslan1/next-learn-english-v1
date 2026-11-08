@@ -5,8 +5,10 @@ import { connection } from "next/server";
 import { FaFire } from "react-icons/fa6";
 import { FiBookOpen, FiEdit3, FiLogOut, FiZap } from "react-icons/fi";
 import { signout } from "@/app/(auth)/actions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatWait, msUntil } from "@/lib/srs";
+import { Progress } from "@/components/ui/progress";
+import { formatWait, MAX_ACTIVE_DECKS, msUntil } from "@/lib/srs";
 import { streakStatus, todayInTurkey } from "@/lib/streak";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,10 @@ export default function HomePage() {
 
       <Suspense fallback={<div className="h-44 animate-pulse rounded-3xl bg-muted" />}>
         <TodayCard />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <MyDecks />
       </Suspense>
 
       <div className="grid grid-cols-2 gap-3">
@@ -118,6 +124,70 @@ async function StreakBadge() {
       <FaFire className={cn("size-4", doneToday && "text-amber")} aria-hidden />
       {count} gün
     </span>
+  );
+}
+
+/** The decks being studied right now, one tap away from studying. */
+async function MyDecks() {
+  await connection();
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("user_decks")
+    .select(
+      "deck_id, next_review_at, known_word_ids, decks(title, category, level, deck_words(count))",
+    );
+
+  const decks = (data ?? [])
+    .flatMap((row) => {
+      const deck = row.decks;
+      if (!deck) return [];
+      return [
+        {
+          id: row.deck_id,
+          title: deck.title,
+          label: deck.category === "yds" ? "YDS" : (deck.level ?? ""),
+          total: deck.deck_words[0]?.count ?? 0,
+          known: row.known_word_ids.length,
+          wait: msUntil(row.next_review_at),
+        },
+      ];
+    })
+    // Decks that are due come first.
+    .sort((a, b) => a.wait - b.wait);
+
+  // Nothing to show: the card above already points to the deck list.
+  if (decks.length === 0) return null;
+
+  return (
+    <section className="flex flex-col gap-3">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-lg font-extrabold">Destelerim</h2>
+        <Link href="/words" className="text-sm font-semibold text-primary">
+          {decks.length}/{MAX_ACTIVE_DECKS} · Tüm desteler
+        </Link>
+      </div>
+      {decks.map((deck) => (
+        <Link
+          key={deck.id}
+          href={`/words/${deck.id}`}
+          className="flex flex-col gap-3 rounded-3xl bg-card p-4 ring-1 ring-border transition-colors hover:bg-muted"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2 font-bold">
+              {deck.title}
+              {deck.label && <Badge variant="outline">{deck.label}</Badge>}
+            </span>
+            <Badge variant={deck.wait <= 0 ? "default" : "secondary"}>
+              {deck.wait <= 0 ? "Tekrar zamanı" : formatWait(deck.wait)}
+            </Badge>
+          </div>
+          <Progress value={deck.total ? (deck.known / deck.total) * 100 : 0} />
+          <span className="text-xs text-muted-foreground">
+            {deck.known}/{deck.total} kelime biliniyor
+          </span>
+        </Link>
+      ))}
+    </section>
   );
 }
 
