@@ -24,7 +24,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Ana gezinme"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center justify-between rounded-full bg-card p-1.5 shadow-lg ring-1 ring-border"
+      className="fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 mx-auto flex max-w-md items-center justify-between rounded-full bg-card p-1.5 shadow-lg ring-1 ring-border"
     >
       {ITEMS.map(({ href, label, icon: Icon, match }) => {
         const active = match(pathname);

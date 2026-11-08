@@ -5,7 +5,7 @@ import { BottomNav } from "@/components/bottom-nav";
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <div className="flex flex-1 flex-col pb-28">{children}</div>
+      <div className="flex flex-1 flex-col pb-[calc(7rem+env(safe-area-inset-bottom))]">{children}</div>
       <Suspense fallback={null}>
         <BottomNav />
       </Suspense>
