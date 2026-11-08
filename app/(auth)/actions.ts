@@ -4,61 +4,55 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type AuthState = { error?: string; message?: string } | undefined;
+export type NicknameState = { error?: string } | undefined;
 
-export async function login(
-  _prev: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
+const NICKNAME_PATTERN = /^[a-zA-Z0-9_]{3,20}$/;
 
-  if (!email || !password) {
-    return { error: "Email and password are required." };
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    return { error: "Invalid email or password." };
-  }
-
-  redirect("/");
-}
-
-export async function signup(
-  _prev: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
-
-  if (!email || !password) {
-    return { error: "Email and password are required." };
-  }
-  if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
-  }
-
+export async function signInWithGoogle() {
   const origin = (await headers()).get("origin");
+  if (!origin) redirect("/login?error=missing_origin");
+
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { display_name: name },
-      emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
-    },
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${origin}/auth/callback` },
   });
 
-  if (error) {
-    return { error: error.message };
+  if (error || !data.url) redirect("/login?error=oauth_failed");
+  redirect(data.url);
+}
+
+export async function setNickname(
+  _prev: NicknameState,
+  formData: FormData,
+): Promise<NicknameState> {
+  const nickname = String(formData.get("nickname") ?? "").trim();
+
+  if (!NICKNAME_PATTERN.test(nickname)) {
+    return {
+      error: "Use 3-20 characters: letters, numbers and underscores only.",
+    };
   }
 
-  // With email confirmation enabled there is no session yet.
-  if (!data.session) {
-    return { message: "Check your email to confirm your account." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ username: nickname })
+    .eq("id", user.id);
+
+  if (error) {
+    // 23505 = unique violation
+    return {
+      error:
+        error.code === "23505"
+          ? "This nickname is already taken."
+          : "Could not save your nickname. Please try again.",
+    };
   }
 
   redirect("/");

@@ -91,6 +91,6 @@ Kelime takibi desteler üzerinden yapılır.
 ## Sıradaki adımlar
 1. Supabase projesi aç, `.env.local` ekle.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
-3. Giriş (auth) akışı (yazıldı).
+3. Giriş: sadece Google ile (yazıldı). İlk girişte benzersiz nickname seçilir (büyük/küçük harf duyarsız).
 4. Mobil öncelikli ana sayfa.
 5. Kelime desteleri ve kart çalışma ekranı (yazıldı). Sıradaki: isteğe bağlı testler (boşluk doldurma, doğru/yanlış), gerçek kelime listeleri.

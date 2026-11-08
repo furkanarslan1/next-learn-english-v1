@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { FiBookOpen, FiLogOut, FiZap } from "react-icons/fi";
 import { MdOutlineSpellcheck } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -51,14 +52,13 @@ export default function HomePage() {
 
 async function Greeting() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const name =
-    (data?.claims?.user_metadata?.display_name as string | undefined) ||
-    data?.claims?.email;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .maybeSingle();
 
-  return (
-    <h1 className="text-xl font-semibold">
-      Welcome{name ? `, ${name}` : ""}
-    </h1>
-  );
+  // Signed in with Google but no nickname yet.
+  if (!profile?.username) redirect("/onboarding");
+
+  return <h1 className="text-xl font-semibold">Welcome, {profile.username}</h1>;
 }
