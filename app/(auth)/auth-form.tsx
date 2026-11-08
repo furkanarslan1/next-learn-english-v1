@@ -55,6 +55,15 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             />
           </div>
 
+          {isLogin && (
+            <Link
+              href="/forgot-password"
+              className="-mt-2 self-end text-sm text-muted-foreground underline underline-offset-4"
+            >
+              Şifremi unuttum
+            </Link>
+          )}
+
           {state?.error && (
             <p role="alert" className="text-sm text-destructive">
               {state.error}

@@ -73,6 +73,56 @@ export async function signup(
   redirect("/onboarding");
 }
 
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: "E-posta gerekli." };
+
+  const origin = (await headers()).get("origin");
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: origin ? `${origin}/auth/callback?next=/reset-password` : undefined,
+  });
+
+  // Same answer whether or not the address has an account, so nobody can probe for accounts.
+  return {
+    message: "Bu e-posta ile bir hesap varsa, şifre sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+  };
+}
+
+export async function updatePassword(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  if (password.length < 8) return { error: "Şifre en az 8 karakter olmalı." };
+  if (password !== confirm) return { error: "Şifreler aynı değil." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?error=reset_failed");
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return {
+      error:
+        error.code === "same_password"
+          ? "Yeni şifre eskisiyle aynı olamaz."
+          : error.code === "weak_password"
+            ? "Şifre çok zayıf. Daha güçlü bir şifre seç."
+            : "Şifre güncellenemedi. Lütfen tekrar dene.",
+    };
+  }
+
+  redirect("/");
+}
+
 export async function setNickname(
   _prev: NicknameState,
   formData: FormData,
