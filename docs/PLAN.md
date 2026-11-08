@@ -15,7 +15,7 @@ Next.js, Supabase (`@supabase/supabase-js`, `@supabase/ssr`), shadcn/ui, react-i
 
 ### Kart içeriği
 - Kelime kartı: İngilizcesi, Türkçesi, örnek cümle, hangi anlamda ve nerede kullanıldığı.
-- Telaffuz için ücretsiz Web Speech API.
+- Ses (telaffuz) şimdilik yok.
 
 ### Aralıklı tekrar aşamaları
 - Aşamalar: 3 saat, 6 saat, 12 saat, 24 saat, 2 gün, 4 gün, 1 hafta, 1 ay. Sayılar örnektir.
