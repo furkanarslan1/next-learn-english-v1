@@ -4,22 +4,66 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export type AuthState = { error?: string; message?: string } | undefined;
 export type NicknameState = { error?: string } | undefined;
 
 const NICKNAME_PATTERN = /^[a-zA-Z0-9_]{3,20}$/;
 
-export async function signInWithGoogle() {
-  const origin = (await headers()).get("origin");
-  if (!origin) redirect("/login?error=missing_origin");
+export async function login(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  if (!email || !password) {
+    return { error: "Email and password are required." };
+  }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${origin}/auth/callback` },
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    return { error: "Invalid email or password." };
+  }
+
+  redirect("/");
+}
+
+export async function signup(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  if (!email || !password) {
+    return { error: "Email and password are required." };
+  }
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
+
+  const origin = (await headers()).get("origin");
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
+    },
   });
 
-  if (error || !data.url) redirect("/login?error=oauth_failed");
-  redirect(data.url);
+  if (error) {
+    return { error: error.message };
+  }
+
+  // With email confirmation enabled there is no session yet.
+  if (!data.session) {
+    return { message: "Check your email to confirm your account." };
+  }
+
+  // New users pick a nickname next.
+  redirect("/onboarding");
 }
 
 export async function setNickname(

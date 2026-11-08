@@ -1,55 +1,28 @@
 import { Suspense } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { signInWithGoogle } from "../actions";
-
-const ERRORS: Record<string, string> = {
-  confirmation_failed: "Sign-in failed. Please try again.",
-  oauth_failed: "Could not start Google sign-in. Please try again.",
-  missing_origin: "Could not start Google sign-in. Please try again.",
-};
+import { AuthForm } from "../auth-form";
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Learn English</CardTitle>
-        <CardDescription>
-          Sign in to build your vocabulary and practice grammar.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <form action={signInWithGoogle}>
-          <Button type="submit" variant="outline" className="w-full">
-            <FcGoogle /> Continue with Google
-          </Button>
-        </form>
-        <Suspense>
-          <ErrorMessage searchParams={searchParams} />
-        </Suspense>
-      </CardContent>
-    </Card>
+    <div className="flex w-full max-w-sm flex-col gap-4">
+      <AuthForm mode="login" />
+      <Suspense>
+        <ErrorMessage searchParams={searchParams} />
+      </Suspense>
+    </div>
   );
 }
 
+// Shown when the confirmation link in the email fails.
 async function ErrorMessage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { error } = await searchParams;
-  const message = typeof error === "string" ? ERRORS[error] : undefined;
-  if (!message) return null;
+  if (error !== "confirmation_failed") return null;
   return (
-    <p role="alert" className="text-sm text-destructive">
-      {message}
+    <p role="alert" className="text-center text-sm text-destructive">
+      Email confirmation failed. Please try again.
     </p>
   );
 }
