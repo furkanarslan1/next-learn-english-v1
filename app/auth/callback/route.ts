@@ -1,15 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { safeNextPath } from "@/lib/safe-redirect";
 import { createClient } from "@/lib/supabase/server";
 
-// Google redirects back here (through Supabase) with a one-time code.
+// Email links (confirmation, password reset) come back here with a one-time code.
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
+  const next = safeNextPath(searchParams.get("next"), "");
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // e.g. the password reset link continues to /reset-password.
+      if (next) return NextResponse.redirect(`${origin}${next}`);
+
       // New users have to pick a nickname first.
       const { data: profile } = await supabase
         .from("profiles")
@@ -21,5 +26,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=confirmation_failed`);
+  return NextResponse.redirect(
+    `${origin}/login?error=${next === "/reset-password" ? "reset_failed" : "confirmation_failed"}`,
+  );
 }

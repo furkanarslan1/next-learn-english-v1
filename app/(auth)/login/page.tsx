@@ -26,10 +26,16 @@ async function ErrorMessage({
       </p>
     );
   }
-  if (error !== "confirmation_failed") return null;
+  const message =
+    error === "confirmation_failed"
+      ? "E-posta onayı başarısız oldu. Lütfen tekrar dene."
+      : error === "reset_failed"
+        ? "Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste."
+        : null;
+  if (!message) return null;
   return (
     <p role="alert" className="text-center text-sm text-destructive">
-      E-posta onayı başarısız oldu. Lütfen tekrar dene.
+      {message}
     </p>
   );
 }
