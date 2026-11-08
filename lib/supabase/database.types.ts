@@ -361,6 +361,7 @@ export type Database = {
         Args: { p_opponent_nickname: string; p_question_count?: number }
         Returns: string
       }
+      delete_my_account: { Args: never; Returns: undefined }
       learn_deck: { Args: { p_deck_id: number }; Returns: undefined }
       my_duels: {
         Args: { p_duel_id?: string }
