@@ -18,6 +18,7 @@ type Word = {
   example_en: string | null;
   example_tr: string | null;
   usage_note: string | null;
+  synonyms: string[];
 };
 
 const PART_OF_SPEECH_TR: Record<string, string> = {
@@ -155,6 +156,13 @@ export function Study({
               </div>
 
               <p className="text-xl font-bold text-primary">{word.turkish}</p>
+
+              {word.synonyms.length > 0 && (
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Eş anlamlılar: </span>
+                  <span className="font-semibold">{word.synonyms.join(", ")}</span>
+                </p>
+              )}
 
               {word.example_en && (
                 <div className="rounded-xl border-l-4 border-amber bg-amber/10 p-3 text-sm">
