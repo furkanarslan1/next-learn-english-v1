@@ -20,12 +20,6 @@ with seed (deck_title, category, level, deck_position, word_position, english, t
   ('Travel', 'general', 'A2', 1, 3, 'passport', 'pasaport', 'noun', 'Don''t forget your passport.', 'Pasaportunu unutma.', 'Used at border control and airports.'),
   ('Travel', 'general', 'A2', 1, 4, 'arrive', 'varmak', 'verb', 'The train arrives at nine.', 'Tren dokuzda varır.', 'arrive IN a city/country, arrive AT a place (station, airport).'),
   ('Travel', 'general', 'A2', 1, 5, 'delay', 'gecikme; ertelemek', 'noun/verb', 'The flight has a two-hour delay.', 'Uçuşun iki saat rötarı var.', 'Noun: "a delay". Verb: "The storm delayed the flight."'),
-  -- YDS · sample deck (placeholder words, to be replaced with the real YDS list)
-  ('YDS Starter', 'yds', null, 1, 1, 'reluctant', 'isteksiz', 'adjective', 'He was reluctant to share his opinion.', 'Fikrini paylaşmakta isteksizdi.', 'reluctant to + verb. Synonym: unwilling.'),
-  ('YDS Starter', 'yds', null, 1, 2, 'inevitable', 'kaçınılmaz', 'adjective', 'Change is inevitable in any career.', 'Değişim her kariyerde kaçınılmazdır.', 'Often used with "the inevitable consequence".'),
-  ('YDS Starter', 'yds', null, 1, 3, 'substantial', 'önemli ölçüde; hatırı sayılır', 'adjective', 'The company made a substantial profit.', 'Şirket hatırı sayılır bir kâr elde etti.', 'Synonyms: considerable, significant.'),
-  ('YDS Starter', 'yds', null, 1, 4, 'diminish', 'azalmak; azaltmak', 'verb', 'Her interest in the subject began to diminish.', 'Konuya olan ilgisi azalmaya başladı.', 'Can be intransitive or transitive.'),
-  ('YDS Starter', 'yds', null, 1, 5, 'comprehensive', 'kapsamlı', 'adjective', 'They published a comprehensive report.', 'Kapsamlı bir rapor yayımladılar.', 'Synonym: thorough, extensive.'),
   -- B1 and B2 · adverbs and linking words
   ('Frequency & Time', 'general', 'B1', 1, 1, 'rarely', 'nadiren', 'adverb', 'He rarely eats meat.', 'O nadiren et yer.', 'Sıklık zarfıdır ve olumsuz anlam taşır, bu yüzden ''not'' ile birlikte kullanılmaz. Genelde ana fiilden önce, ''be'' fiilinden sonra gelir.'),
   ('Frequency & Time', 'general', 'B1', 1, 2, 'frequently', 'sık sık', 'adverb', 'She frequently travels for work.', 'O iş için sık sık seyahat eder.', 'Bir şeyin çok tekrarlandığını anlatır. ''often'' ile aynı anlamdadır ama daha resmidir.'),
@@ -73,3 +67,48 @@ select d.id, w.id, g.word_position
 from guarded g
 join new_decks d on d.title = g.deck_title
 join new_words w on w.english = g.english;
+
+-- YDS decks: the same words as above, grouped in their own category.
+-- They link to the existing word rows, so nothing is duplicated.
+with yds (deck_title, deck_position, word_position, english) as (
+  values
+  ('YDS · Frequency & Time', 1, 1, 'rarely'),
+  ('YDS · Frequency & Time', 1, 2, 'frequently'),
+  ('YDS · Frequency & Time', 1, 3, 'immediately'),
+  ('YDS · Frequency & Time', 1, 4, 'recently'),
+  ('YDS · Frequency & Time', 1, 5, 'currently'),
+  ('YDS · Certainty & Opinion', 2, 1, 'apparently'),
+  ('YDS · Certainty & Opinion', 2, 2, 'obviously'),
+  ('YDS · Certainty & Opinion', 2, 3, 'definitely'),
+  ('YDS · Certainty & Opinion', 2, 4, 'probably'),
+  ('YDS · Certainty & Opinion', 2, 5, 'unfortunately'),
+  ('YDS · Degree & Result', 3, 1, 'actually'),
+  ('YDS · Degree & Result', 3, 2, 'eventually'),
+  ('YDS · Degree & Result', 3, 3, 'hardly'),
+  ('YDS · Degree & Result', 3, 4, 'nearly'),
+  ('YDS · Degree & Result', 3, 5, 'otherwise'),
+  ('YDS · Linking Words', 4, 1, 'therefore'),
+  ('YDS · Linking Words', 4, 2, 'however'),
+  ('YDS · Linking Words', 4, 3, 'meanwhile'),
+  ('YDS · Linking Words', 4, 4, 'moreover'),
+  ('YDS · Linking Words', 4, 5, 'nevertheless'),
+  ('YDS · Manner & Degree', 5, 1, 'gradually'),
+  ('YDS · Manner & Degree', 5, 2, 'entirely'),
+  ('YDS · Manner & Degree', 5, 3, 'merely'),
+  ('YDS · Manner & Degree', 5, 4, 'deliberately'),
+  ('YDS · Manner & Degree', 5, 5, 'relatively')
+),
+guarded as (
+  select * from yds where not exists (select 1 from public.decks d where d.title = yds.deck_title)
+),
+new_decks as (
+  insert into public.decks (title, category, level, position)
+  select distinct deck_title, 'yds'::public.deck_category, null::public.cefr_level, deck_position
+  from guarded
+  returning id, title
+)
+insert into public.deck_words (deck_id, word_id, position)
+select d.id, w.id, g.word_position
+from guarded g
+join new_decks d on d.title = g.deck_title
+join public.words w on w.english = g.english;

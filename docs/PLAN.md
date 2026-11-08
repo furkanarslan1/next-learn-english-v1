@@ -50,7 +50,7 @@ Kelime takibi desteler üzerinden yapılır.
 - Desteler `category` alanıyla ayrılır: `general` (A1, A2, B1... seviyeye göre) ve `yds` (YDS kelimeleri, seviyesi yok).
 - Kelimeler ekranında seviye ve YDS sekme olarak görünür.
 - Aynı anda en fazla 3 aktif deste (`MAX_ACTIVE_DECKS`, `lib/srs.ts`). Tekrar aralıkları da orada.
-- Örnek veri `supabase/seed.sql` içinde. Gerçek kelimeler (özellikle YDS listesi) kullanıcıdan alınıp buraya eklenecek.
+- Örnek veri `supabase/seed.sql` içinde. YDS kelimeleri hem seviye desteleri (B1/B2) hem ayrı YDS desteleri olarak durur. Aynı kelime birden fazla desteye bağlanabilir (`deck_words`), kelime kopyalanmaz. Yeni YDS kelimeleri geldikçe seed'e eklenir.
 
 #### "Biliyorum" işareti
 - Kullanıcı destedeki bir kelimeyi "Biliyorum" diye işaretleyebilir. Geri alınabilir.
