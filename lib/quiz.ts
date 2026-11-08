@@ -13,6 +13,15 @@ export type FillQuestion = {
   /** Example sentence with the word blanked out, if it can be found. */
   hint: string | null;
   answer: string;
+  /** Per character of `answer`: true = shown to the player, false = must be typed. */
+  mask: boolean[];
+};
+
+export type MatchRound = {
+  /** English words, in a fixed order. */
+  left: { id: number; text: string }[];
+  /** Turkish meanings, shuffled. `id` matches the English word's id. */
+  right: { id: number; text: string }[];
 };
 
 export type TrueFalseQuestion = {
@@ -48,12 +57,45 @@ function blankOut(sentence: string | null, english: string) {
   return pattern.test(sentence) ? sentence.replace(pattern, "_____") : null;
 }
 
+/**
+ * Decides which characters are shown. Non-letters (spaces, hyphens) are always
+ * shown, the first letter is shown, plus roughly 30% of the remaining letters.
+ */
+export function buildMask(word: string): boolean[] {
+  const chars = [...word];
+  const letterIdx = chars.flatMap((c, i) => (/\p{L}/u.test(c) ? [i] : []));
+  const mask = chars.map((c) => !/\p{L}/u.test(c));
+  if (letterIdx.length === 0) return mask;
+
+  mask[letterIdx[0]] = true;
+  const rest = letterIdx.slice(1);
+  const extra = Math.floor(rest.length * 0.3);
+  for (const i of shuffle(rest).slice(0, extra)) mask[i] = true;
+  return mask;
+}
+
 export function buildFillQuestions(words: QuizWord[]): FillQuestion[] {
   return shuffle(words).map((w) => ({
     id: w.id,
     turkish: w.turkish,
     hint: blankOut(w.example_en, w.english),
     answer: w.english,
+    mask: buildMask(w.english),
+  }));
+}
+
+/** Splits words into rounds of `size` (a too-small last round is merged into the previous one). */
+export function buildMatchRounds(words: QuizWord[], size = 5): MatchRound[] {
+  if (words.length < 2) return [];
+  const shuffled = shuffle(words);
+  const chunks: QuizWord[][] = [];
+  for (let i = 0; i < shuffled.length; i += size) chunks.push(shuffled.slice(i, i + size));
+  if (chunks.length > 1 && chunks[chunks.length - 1].length < 2) {
+    chunks[chunks.length - 2].push(...chunks.pop()!);
+  }
+  return chunks.map((chunk) => ({
+    left: chunk.map((w) => ({ id: w.id, text: w.english })),
+    right: shuffle(chunk.map((w) => ({ id: w.id, text: w.turkish }))),
   }));
 }
 

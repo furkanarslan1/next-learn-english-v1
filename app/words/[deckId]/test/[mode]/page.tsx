@@ -4,9 +4,20 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { FiArrowLeft } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
-import { buildFillQuestions, buildTrueFalseQuestions } from "@/lib/quiz";
+import {
+  buildFillQuestions,
+  buildMatchRounds,
+  buildTrueFalseQuestions,
+} from "@/lib/quiz";
 import { createClient } from "@/lib/supabase/server";
+import { Match } from "@/components/match";
 import { Quiz } from "@/components/quiz";
+
+const MODE_TITLE = {
+  fill: "Boşluk doldurma",
+  tf: "Doğru / Yanlış",
+  match: "Eşleştirme",
+} as const;
 
 export default function TestPage({
   params,
@@ -28,7 +39,7 @@ async function QuizLoader({
   await connection(); // questions are shuffled per request
   const { deckId: rawId, mode } = await params;
   const deckId = Number(rawId);
-  if (!Number.isInteger(deckId) || (mode !== "fill" && mode !== "tf")) notFound();
+  if (!Number.isInteger(deckId) || (mode !== "fill" && mode !== "tf" && mode !== "match")) notFound();
 
   const supabase = await createClient();
   const { data: deck } = await supabase
@@ -54,10 +65,16 @@ async function QuizLoader({
           <FiArrowLeft />
         </Button>
         <h1 className="text-xl font-semibold">
-          {deck.title} · {mode === "fill" ? "Boşluk doldurma" : "Doğru / Yanlış"}
+          {deck.title} · {MODE_TITLE[mode]}
         </h1>
       </header>
-      {mode === "fill" ? (
+      {mode === "match" ? (
+        <Match
+          rounds={buildMatchRounds(words)}
+          backHref={`/words/${deckId}`}
+          backLabel="Desteye dön"
+        />
+      ) : mode === "fill" ? (
         <Quiz
           mode="fill"
           backHref={`/words/${deckId}`}

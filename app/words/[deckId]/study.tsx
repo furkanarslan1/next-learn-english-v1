@@ -97,7 +97,14 @@ export function Study({
             <Button variant="ghost" disabled={pending} onClick={() => setIndex(0)}>
               Kartları tekrar gez
             </Button>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2">
+              <Button
+                variant="secondary"
+                nativeButton={false}
+                render={<Link href={`/words/${deckId}/test/match`} />}
+              >
+                Eşleştirme
+              </Button>
               <Button
                 variant="secondary"
                 nativeButton={false}

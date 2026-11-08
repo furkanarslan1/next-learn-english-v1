@@ -3,10 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { FiArrowLeft } from "react-icons/fi";
+import { Match } from "@/components/match";
 import { Quiz } from "@/components/quiz";
 import { Button } from "@/components/ui/button";
 import {
   buildFillQuestions,
+  buildMatchRounds,
   buildTrueFalseQuestions,
   pickRandom,
 } from "@/lib/quiz";
@@ -35,7 +37,7 @@ export default function PracticeModePage({
 async function PracticeQuiz({ params }: { params: Promise<{ mode: string }> }) {
   await connection(); // questions are random per request
   const { mode } = await params;
-  if (mode !== "fill" && mode !== "tf") notFound();
+  if (mode !== "fill" && mode !== "tf" && mode !== "match") notFound();
 
   const supabase = await createClient();
   const [{ data: profile }, { data: decks }] = await Promise.all([
@@ -68,6 +70,9 @@ async function PracticeQuiz({ params }: { params: Promise<{ mode: string }> }) {
     .in("id", picked);
 
   const list = words ?? [];
+  if (mode === "match") {
+    return <Match rounds={buildMatchRounds(list)} backHref="/words" backLabel="Kelimelere dön" />;
+  }
   return mode === "fill" ? (
     <Quiz mode="fill" backHref="/words" backLabel="Kelimelere dön" questions={buildFillQuestions(list)} />
   ) : (
