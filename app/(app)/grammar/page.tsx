@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatWait, msUntil } from "@/lib/srs";
 import { createClient } from "@/lib/supabase/server";
 
 export default function GrammarPage() {
@@ -31,10 +33,14 @@ export default function GrammarPage() {
 async function Topics() {
   await connection(); // session + time checks must run at request time
   const supabase = await createClient();
-  const { data: topics } = await supabase
-    .from("grammar_topics")
-    .select("slug, title, level, position, content")
-    .order("position");
+  const [{ data: topics }, { data: reviews }] = await Promise.all([
+    supabase
+      .from("grammar_topics")
+      .select("id, slug, title, level, position, content")
+      .order("position"),
+    supabase.from("user_grammar").select("topic_id, next_review_at"),
+  ]);
+  const reviewByTopic = new Map((reviews ?? []).map((r) => [r.topic_id, r.next_review_at]));
 
   if (!topics?.length) {
     return <p className="text-sm text-muted-foreground">Henüz konu yok.</p>;
@@ -60,11 +66,20 @@ async function Topics() {
                 typeof t.content === "object" && t.content && "summary" in t.content
                   ? String(t.content.summary)
                   : "";
+              const nextAt = reviewByTopic.get(t.id);
+              const wait = nextAt ? msUntil(nextAt) : null;
               return (
                 <Link key={t.slug} href={`/grammar/${t.slug}`}>
                   <Card className="transition-colors hover:bg-muted">
                     <CardHeader>
-                      <CardTitle>{t.title}</CardTitle>
+                      <CardTitle className="flex items-center justify-between gap-2">
+                        {t.title}
+                        {wait !== null && (
+                          <Badge variant={wait <= 0 ? "default" : "outline"}>
+                            {wait <= 0 ? "Tekrar zamanı" : `Sonraki: ${formatWait(wait)}`}
+                          </Badge>
+                        )}
+                      </CardTitle>
                       {summary && <CardDescription>{summary}</CardDescription>}
                     </CardHeader>
                   </Card>

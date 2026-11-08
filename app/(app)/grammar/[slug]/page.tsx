@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { parseGrammarContent } from "@/lib/grammar";
+import { formatWait, msUntil } from "@/lib/srs";
 import { createClient } from "@/lib/supabase/server";
 
 export default function GrammarTopicPage({
@@ -32,10 +33,17 @@ async function Topic({ params }: { params: Promise<{ slug: string }> }) {
   const supabase = await createClient();
   const { data: topic } = await supabase
     .from("grammar_topics")
-    .select("title, level, content")
+    .select("id, title, level, content")
     .eq("slug", slug)
     .maybeSingle();
   if (!topic) notFound();
+
+  const { data: review } = await supabase
+    .from("user_grammar")
+    .select("next_review_at")
+    .eq("topic_id", topic.id)
+    .maybeSingle();
+  const wait = review ? msUntil(review.next_review_at) : null;
 
   const c = parseGrammarContent(topic.content);
 
@@ -46,6 +54,23 @@ async function Topic({ params }: { params: Promise<{ slug: string }> }) {
         <Badge variant="outline">{topic.level}</Badge>
       </div>
       {c.summary && <p className="text-muted-foreground">{c.summary}</p>}
+
+      {c.exercises.length > 0 && (
+        <Card className="bg-primary/10 ring-0">
+          <CardContent className="flex flex-col gap-3">
+            <p className="font-semibold">
+              {wait === null
+                ? "Konuyu okudun mu? Kendini test et, tekrar takvimine eklenir."
+                : wait <= 0
+                  ? "Bu konunun tekrar zamanı geldi."
+                  : `Sıradaki tekrar ${formatWait(wait)}.`}
+            </p>
+            <Button nativeButton={false} render={<Link href={`/grammar/${slug}/test`} />}>
+              {wait === null ? "Testi çöz" : "Tekrar testi çöz"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {c.rules.length > 0 && (
         <Card>
