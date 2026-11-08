@@ -109,6 +109,9 @@ Kelime takibi desteler üzerinden yapılır.
 - Yanlış yapılan kelimeler için ayrı tekrar listesi.
 - Boşluk doldurma testi (kalıpları cümle içinde pekiştirir).
 
+## Ana sayfa
+- "Destelerim": aktif desteler (en fazla 3) ana sayfada listelenir, tekrar zamanı gelenler üstte. Tek dokunuşla deste çalışmaya girilir.
+
 ## Tema
 - Ana renk indigo (primary), vurgu amber, başarı yeşil. Renkler `app/globals.css` içinde tek yerden değişir.
 - Font: Nunito. Yuvarlak köşeler (`--radius: 1rem`), büyük dokunma alanları (buton yüksekliği 44px).
