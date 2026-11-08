@@ -2,11 +2,14 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
+import { FaFire } from "react-icons/fa6";
 import { FiBookOpen, FiEdit3, FiLogOut, FiZap } from "react-icons/fi";
 import { signout } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { formatWait, msUntil } from "@/lib/srs";
+import { streakStatus, todayInTurkey } from "@/lib/streak";
 import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   return (
@@ -15,11 +18,16 @@ export default function HomePage() {
         <Suspense fallback={<h1 className="text-2xl font-extrabold">Merhaba</h1>}>
           <Greeting />
         </Suspense>
-        <form action={signout}>
-          <Button variant="ghost" size="icon" type="submit" aria-label="Çıkış yap">
-            <FiLogOut />
-          </Button>
-        </form>
+        <div className="flex items-center gap-1">
+          <Suspense fallback={null}>
+            <StreakBadge />
+          </Suspense>
+          <form action={signout}>
+            <Button variant="ghost" size="icon" type="submit" aria-label="Çıkış yap">
+              <FiLogOut />
+            </Button>
+          </form>
+        </div>
       </header>
 
       <Suspense fallback={<div className="h-44 animate-pulse rounded-3xl bg-muted" />}>
@@ -81,6 +89,35 @@ async function Greeting() {
     <h1 className="text-2xl font-extrabold tracking-tight">
       Merhaba, {profile.username}
     </h1>
+  );
+}
+
+/** Days in a row with a completed activity. Muted until today's activity is done. */
+async function StreakBadge() {
+  await connection();
+  const supabase = await createClient();
+  const { data: p } = await supabase
+    .from("profiles")
+    .select("streak_count, streak_last_date")
+    .maybeSingle();
+
+  const { count, doneToday } = streakStatus(
+    p?.streak_count ?? 0,
+    p?.streak_last_date ?? null,
+    todayInTurkey(),
+  );
+
+  return (
+    <span
+      className={cn(
+        "flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-extrabold",
+        doneToday ? "bg-amber/25 text-amber-foreground" : "bg-muted text-muted-foreground",
+      )}
+      title={doneToday ? "Bugün tamamlandı" : "Seriyi sürdürmek için bugün bir etkinlik tamamla"}
+    >
+      <FaFire className={cn("size-4", doneToday && "text-amber")} aria-hidden />
+      {count} gün
+    </span>
   );
 }
 

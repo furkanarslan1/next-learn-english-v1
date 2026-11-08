@@ -198,6 +198,9 @@ export type Database = {
           learned_deck_ids: number[]
           learned_word_ids: number[]
           level: Database["public"]["Enums"]["cefr_level"]
+          streak_best: number
+          streak_count: number
+          streak_last_date: string | null
           username: string | null
         }
         Insert: {
@@ -207,6 +210,9 @@ export type Database = {
           learned_deck_ids?: number[]
           learned_word_ids?: number[]
           level?: Database["public"]["Enums"]["cefr_level"]
+          streak_best?: number
+          streak_count?: number
+          streak_last_date?: string | null
           username?: string | null
         }
         Update: {
@@ -216,6 +222,9 @@ export type Database = {
           learned_deck_ids?: number[]
           learned_word_ids?: number[]
           level?: Database["public"]["Enums"]["cefr_level"]
+          streak_best?: number
+          streak_count?: number
+          streak_last_date?: string | null
           username?: string | null
         }
         Relationships: []
@@ -370,6 +379,7 @@ export type Database = {
         Args: { p_answers: number[]; p_duel_id: string; p_time_ms: number }
         Returns: number
       }
+      touch_streak: { Args: never; Returns: undefined }
     }
     Enums: {
       cefr_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"

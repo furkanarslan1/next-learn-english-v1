@@ -38,6 +38,7 @@ export async function submitDuel(
   timeMs: number,
 ) {
   const supabase = await createClient();
+  await supabase.rpc("touch_streak");
   await supabase.rpc("submit_duel", {
     p_duel_id: duelId,
     p_answers: answers,
