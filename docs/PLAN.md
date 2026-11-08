@@ -1,13 +1,20 @@
 # İngilizce Uygulaması – Plan ve Kararlar
 
 ## Amaç
-Gramer, kelime ve kalıpları unutmamak için tekrar ve pratik yapılabilen uygulama. Önce Next.js (web, mobil uyumlu), sonra Expo ile mobil app. Backend: Supabase (free plan ile başla).
+Gramer, kelime ve kalıpları unutmamak için tekrar ve pratik yapılabilen uygulama. Next.js ile mobil uyumlu bir web uygulaması (PWA). Backend: Supabase (free plan ile başla).
 
 ## Teknoloji
 Next.js, Supabase (`@supabase/supabase-js`, `@supabase/ssr`), shadcn/ui, react-icons, Tailwind.
 
 ## Zorlanılan konular
 - Kullanıcının not aldığı zor konular (bağlaçlar, kalıplar, deyimsel fiiller ve gramer) hazırlandı. 94 kelime B2/C1 desteleri ve YDS destelerinde, 23 gramer konusu B1/B2/C1 sekmelerinde (her birinde 5 alıştırma).
+
+## PWA ve yayın hazırlığı
+- Uygulama PWA olarak kurulabilir: manifest, ikonlar, çevrimdışı yedek sayfası (gizli veri önbelleğe alınmaz) ve güvenlik başlıkları var. Profil sayfasında "Ana ekrana ekle" kartı bulunur (iPhone için adımlar yazılıdır).
+- Profil sayfası: istatistikler, nickname değiştirme, çıkış ve hesap silme (`delete_my_account()`).
+- Şifre sıfırlama: `/forgot-password` ve `/reset-password`; dönüş adresi `safeNextPath` ile doğrulanır.
+- Kullanıcı kendi profilinde sadece `username` ve `display_name` alanını doğrudan değiştirebilir; seri ve öğrenilen listeleri yalnızca sunucu fonksiyonlarıyla güncellenir.
+- Testler: `pnpm test` (vitest, `lib/` altındaki saf mantık). GitHub Actions `ci.yml` lint, test ve build çalıştırır.
 
 ## Ana sayfa bölümleri
 - Kelime öğren
@@ -102,9 +109,8 @@ Kelime takibi desteler üzerinden yapılır.
 ## Gramer tekrarı
 - Her konunun 5 çoktan seçmeli sorusu var. Test %70 ve üstü geçilirse konu `user_grammar` ile aynı aşama takvimine göre tekrar edilir. Kalınırsa bir aşama geri gidip 3 saat sonra tekrar gelir. Tekrar zamanı gelmemişse takvim değişmez.
 
-## 4. Expo hazırlığı
-- Tekrar aralığı ve skor gibi iş mantığı UI'dan ayrı saf fonksiyonlar olarak yazılır, mobilde de kullanılır.
-- Veri her iki platformda aynı Supabase backend'inden gelir.
+## 4. Mobil uyumluluk
+- Tekrar aralığı ve skor gibi iş mantığı UI'dan ayrı saf fonksiyonlar olarak `lib/` altında tutulur ve test edilir.
 - Tasarım mobile-first yapılır.
 
 ## 5. İsteğe bağlı eklemeler
@@ -132,4 +138,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş: e-posta ve şifre (yazıldı). Kayıttan sonra benzersiz nickname seçilir (büyük/küçük harf duyarsız). Google girişi şimdilik ertelendi.
 4. Mobil öncelikli ana sayfa.
-5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Gramer testleri, günlük seri ve canlı düello da yazıldı. Sıradaki: yeni kelimeler geldikçe ekleme, Expo.
+5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Gramer testleri, günlük seri ve canlı düello da yazıldı. Sıradaki: yeni kelimeler geldikçe ekleme.
