@@ -3,10 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { FaFire } from "react-icons/fa6";
-import { FiBookOpen, FiEdit3, FiLogOut, FiZap } from "react-icons/fi";
-import { signout } from "@/app/(auth)/actions";
+import { FiBookOpen, FiEdit3, FiZap } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatWait, MAX_ACTIVE_DECKS, msUntil } from "@/lib/srs";
 import { streakStatus, todayInTurkey } from "@/lib/streak";
@@ -24,11 +22,6 @@ export default function HomePage() {
           <Suspense fallback={null}>
             <StreakBadge />
           </Suspense>
-          <form action={signout}>
-            <Button variant="ghost" size="icon" type="submit" aria-label="Çıkış yap">
-              <FiLogOut />
-            </Button>
-          </form>
         </div>
       </header>
 
