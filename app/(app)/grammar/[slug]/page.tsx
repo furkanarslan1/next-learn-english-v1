@@ -10,6 +10,9 @@ import { parseGrammarContent } from "@/lib/grammar";
 import { formatWait, msUntil } from "@/lib/srs";
 import { createClient } from "@/lib/supabase/server";
 
+// Only these three labels read naturally with "cümle" appended.
+const STANDARD_LABELS = ["Olumlu", "Olumsuz", "Soru"];
+
 export default function GrammarTopicPage({
   params,
 }: PageProps<"/grammar/[slug]">) {
@@ -91,7 +94,7 @@ async function Topic({ params }: { params: Promise<{ slug: string }> }) {
       {c.forms.map((f) => (
         <Card key={f.label}>
           <CardHeader>
-            <CardTitle>{f.label} cümle</CardTitle>
+            <CardTitle>{STANDARD_LABELS.includes(f.label) ? `${f.label} cümle` : f.label}</CardTitle>
             <code className="w-fit rounded bg-muted px-2 py-1 text-sm">{f.formula}</code>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
