@@ -13,8 +13,8 @@ import {
 } from "@/lib/quiz";
 
 type Props =
-  | { mode: "fill"; deckId: number; questions: FillQuestion[] }
-  | { mode: "tf"; deckId: number; questions: TrueFalseQuestion[] };
+  | { mode: "fill"; backHref: string; backLabel: string; questions: FillQuestion[] }
+  | { mode: "tf"; backHref: string; backLabel: string; questions: TrueFalseQuestion[] };
 
 // Practice only: everything runs in the browser, nothing is saved.
 export function Quiz(props: Props) {
@@ -71,9 +71,9 @@ export function Quiz(props: Props) {
           <Button
             variant="ghost"
             nativeButton={false}
-            render={<Link href={`/words/${props.deckId}`} />}
+            render={<Link href={props.backHref} />}
           >
-            Desteye dön
+            {props.backLabel}
           </Button>
         </CardContent>
       </Card>
