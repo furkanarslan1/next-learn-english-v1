@@ -110,6 +110,7 @@ Kelime takibi desteler üzerinden yapılır.
 - Boşluk doldurma testi (kalıpları cümle içinde pekiştirir).
 
 ## Ana sayfa
+- Ana sayfada "bugün tekrar bekleyen" özet kartı yoktur (kaldırıldı). Tekrar durumu "Destelerim" kartlarındaki rozetlerde görünür.
 - "Destelerim": aktif desteler (en fazla 3) ana sayfada listelenir, tekrar zamanı gelenler üstte. Tek dokunuşla deste çalışmaya girilir.
 
 ## Tema

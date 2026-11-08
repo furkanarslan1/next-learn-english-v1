@@ -32,10 +32,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      <Suspense fallback={<div className="h-44 animate-pulse rounded-3xl bg-muted" />}>
-        <TodayCard />
-      </Suspense>
-
       <Suspense fallback={null}>
         <MyDecks />
       </Suspense>
@@ -187,61 +183,6 @@ async function MyDecks() {
           </span>
         </Link>
       ))}
-    </section>
-  );
-}
-
-/** What to do next: due reviews, or a way to get started. */
-async function TodayCard() {
-  await connection();
-  const supabase = await createClient();
-  const [{ data: decks }, { data: topics }] = await Promise.all([
-    supabase.from("user_decks").select("next_review_at"),
-    supabase.from("user_grammar").select("next_review_at"),
-  ]);
-
-  const deckWaits = (decks ?? []).map((d) => msUntil(d.next_review_at));
-  const topicWaits = (topics ?? []).map((t) => msUntil(t.next_review_at));
-  const waits = [...deckWaits, ...topicWaits];
-  const dueDecks = deckWaits.filter((w) => w <= 0).length;
-  const dueTopics = topicWaits.filter((w) => w <= 0).length;
-  const nextWait = waits.length > 0 ? Math.min(...waits) : 0;
-
-  const dueText = [
-    dueDecks > 0 ? `${dueDecks} deste` : null,
-    dueTopics > 0 ? `${dueTopics} gramer konusu` : null,
-  ]
-    .filter(Boolean)
-    .join(" ve ");
-
-  const content =
-    waits.length === 0
-      ? { title: "Bir deste seç ve başla", action: "Desteleri gör", href: "/words" }
-      : dueDecks + dueTopics > 0
-        ? {
-            title: `${dueText} tekrar bekliyor`,
-            action: "Tekrara başla",
-            href: dueDecks > 0 ? "/words" : "/grammar",
-          }
-        : {
-            title: `Bugünlük tekrarların bitti. Sıradaki tekrar ${formatWait(nextWait)}.`,
-            action: "Genel pratik yap",
-            href: "/practice",
-          };
-
-  return (
-    <section className="flex flex-col items-start gap-5 rounded-3xl bg-primary p-6 text-primary-foreground">
-      <h2 className="text-2xl font-extrabold leading-tight tracking-tight">
-        {content.title}
-      </h2>
-      <Button
-        size="lg"
-        className="bg-card text-foreground hover:bg-card/90"
-        nativeButton={false}
-        render={<Link href={content.href} />}
-      >
-        {content.action}
-      </Button>
     </section>
   );
 }
