@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { FiArrowLeft } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ export default function WordsPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 p-4">
       <header className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" render={<Link href="/" aria-label="Back" />}>
+        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/" aria-label="Back" />}>
           <FiArrowLeft />
         </Button>
         <h1 className="text-xl font-semibold">Learn words</h1>
@@ -27,6 +28,7 @@ export default function WordsPage() {
 }
 
 async function Decks() {
+  await connection(); // session + time checks must run at request time
   const supabase = await createClient();
   const [{ data: decks }, { data: active }, { data: profile }] = await Promise.all([
     supabase
@@ -87,7 +89,7 @@ async function Decks() {
                   <p className="text-sm text-muted-foreground">{total} words</p>
                   {row && <Progress value={total ? (knownCount / total) * 100 : 0} />}
                   {row ? (
-                    <Button render={<Link href={`/words/${deck.id}`} />}>Study</Button>
+                    <Button nativeButton={false} render={<Link href={`/words/${deck.id}`} />}>Study</Button>
                   ) : !isLearned ? (
                     <form action={startDeck.bind(null, deck.id)}>
                       <Button type="submit" className="w-full" disabled={limitReached}>
