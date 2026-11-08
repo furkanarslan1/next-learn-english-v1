@@ -6,6 +6,9 @@ Gramer, kelime ve kalıpları unutmamak için tekrar ve pratik yapılabilen uygu
 ## Teknoloji
 Next.js, Supabase (`@supabase/supabase-js`, `@supabase/ssr`), shadcn/ui, react-icons, Tailwind.
 
+## Zorlanılan konular
+- Kullanıcının not aldığı zor konular (bağlaçlar, kalıplar, deyimsel fiiller ve gramer) hazırlandı. 94 kelime B2/C1 desteleri ve YDS destelerinde, 23 gramer konusu B1/B2/C1 sekmelerinde (her birinde 5 alıştırma).
+
 ## Ana sayfa bölümleri
 - Kelime öğren
 - Gramer çalış
