@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { FiCheck, FiChevronLeft, FiChevronRight, FiVolume2 } from "react-icons/fi";
+import { FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,12 +58,6 @@ export function Study({
       return next;
     });
 
-  const speak = (text: string) => {
-    if (typeof speechSynthesis === "undefined") return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    speechSynthesis.speak(utterance);
-  };
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -146,14 +140,6 @@ export function Study({
                   </Badge>
                 )}
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Telaffuz"
-                onClick={() => speak(word.english)}
-              >
-                <FiVolume2 />
-              </Button>
             </div>
 
             <p className="text-xl">{word.turkish}</p>
