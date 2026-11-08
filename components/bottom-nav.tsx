@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiBookOpen, FiEdit3, FiHome, FiZap } from "react-icons/fi";
+import { FiBookOpen, FiEdit3, FiHome, FiUser, FiZap } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -15,6 +15,7 @@ const ITEMS = [
   },
   { href: "/grammar", label: "Gramer", icon: FiEdit3, match: (p: string) => p.startsWith("/grammar") },
   { href: "/duels", label: "Düello", icon: FiZap, match: (p: string) => p.startsWith("/duels") },
+  { href: "/profile", label: "Profil", icon: FiUser, match: (p: string) => p.startsWith("/profile") },
 ];
 
 /** Floating bottom dock. Same layout on phones and desktop. */
