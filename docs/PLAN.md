@@ -85,6 +85,6 @@ Kelime takibi desteler üzerinden yapılır.
 ## Sıradaki adımlar
 1. Supabase projesi aç, `.env.local` ekle.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
-3. Giriş (auth) akışı.
+3. Giriş (auth) akışı (yazıldı).
 4. Mobil öncelikli ana sayfa.
 5. Kelime seçme ve tekrar ekranı.
