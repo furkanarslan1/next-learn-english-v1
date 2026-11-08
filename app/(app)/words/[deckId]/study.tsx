@@ -2,10 +2,11 @@
 
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiCheck, FiRotateCcw, FiX } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SwipeCard, type SwipeCardHandle, type SwipeDirection } from "@/components/swipe-card";
 import { cn } from "@/lib/utils";
 import { completeSession, learnDeck } from "../actions";
 
@@ -18,8 +19,6 @@ type Word = {
   example_tr: string | null;
   usage_note: string | null;
 };
-
-const SWIPE_THRESHOLD = 50;
 
 const PART_OF_SPEECH_TR: Record<string, string> = {
   noun: "isim",
@@ -43,21 +42,32 @@ export function Study({
   const [index, setIndex] = useState(0);
   const [known, setKnown] = useState<Set<number>>(new Set());
   const [pending, startTransition] = useTransition();
-  const startX = useRef<number | null>(null);
+  const cardRef = useRef<SwipeCardHandle>(null);
 
   const isSummary = index >= words.length;
   const word = words[index];
 
-  const go = (delta: number) =>
-    setIndex((i) => Math.min(Math.max(i + delta, 0), words.length));
-
-  const toggleKnown = (id: number) =>
+  // Swipe right = "I know it" (hidden in later sessions), swipe left = "not yet".
+  const decide = (direction: SwipeDirection) => {
     setKnown((prev) => {
       const next = new Set(prev);
-      if (!next.delete(id)) next.add(id);
+      if (direction === "right") next.add(word.id);
+      else next.delete(word.id);
       return next;
     });
+    setIndex((i) => i + 1);
+  };
 
+  const undo = () => {
+    const previous = words[index - 1];
+    if (!previous) return;
+    setKnown((prev) => {
+      const next = new Set(prev);
+      next.delete(previous.id);
+      return next;
+    });
+    setIndex(index - 1);
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -126,19 +136,16 @@ export function Study({
           </CardContent>
         </Card>
       ) : (
-        <Card
-          className="touch-pan-y select-none rounded-3xl"
-          onPointerDown={(e) => (startX.current = e.clientX)}
-          onPointerUp={(e) => {
-            if (startX.current === null) return;
-            const dx = e.clientX - startX.current;
-            startX.current = null;
-            if (dx <= -SWIPE_THRESHOLD) go(1);
-            else if (dx >= SWIPE_THRESHOLD) go(-1);
-          }}
-        >
-          <CardContent className="flex flex-col gap-4">
-            <div className="flex items-start justify-between gap-2">
+        <div className="relative">
+          {/* A hint of the cards waiting underneath. */}
+          {index + 1 < words.length && (
+            <div
+              aria-hidden
+              className="absolute inset-x-4 -bottom-2 top-3 -z-10 rounded-3xl bg-muted ring-1 ring-border"
+            />
+          )}
+          <SwipeCard key={word.id} ref={cardRef} onSwipe={decide}>
+            <div className="flex flex-col gap-4 p-5">
               <div>
                 <p className="text-4xl font-extrabold tracking-tight">{word.english}</p>
                 {word.part_of_speech && (
@@ -147,55 +154,72 @@ export function Study({
                   </Badge>
                 )}
               </div>
+
+              <p className="text-xl font-bold text-primary">{word.turkish}</p>
+
+              {word.example_en && (
+                <div className="rounded-xl border-l-4 border-amber bg-amber/10 p-3 text-sm">
+                  <p>{word.example_en}</p>
+                  {word.example_tr && (
+                    <p className="mt-1 text-muted-foreground">{word.example_tr}</p>
+                  )}
+                </div>
+              )}
+
+              {word.usage_note && (
+                <div className="text-sm">
+                  <p className="font-medium">Ne için kullanılır?</p>
+                  <p className="text-muted-foreground">{word.usage_note}</p>
+                </div>
+              )}
             </div>
-
-            <p className="text-xl font-bold text-primary">{word.turkish}</p>
-
-            {word.example_en && (
-              <div className="rounded-xl border-l-4 border-amber bg-amber/10 p-3 text-sm">
-                <p>{word.example_en}</p>
-                {word.example_tr && (
-                  <p className="mt-1 text-muted-foreground">{word.example_tr}</p>
-                )}
-              </div>
-            )}
-
-            {word.usage_note && (
-              <div className="text-sm">
-                <p className="font-medium">Ne için kullanılır?</p>
-                <p className="text-muted-foreground">{word.usage_note}</p>
-              </div>
-            )}
-
-            <Button
-              variant={known.has(word.id) ? "default" : "outline"}
-              onClick={() => toggleKnown(word.id)}
-            >
-              <FiCheck /> {known.has(word.id) ? "Biliyorum olarak işaretlendi" : "Biliyorum"}
-            </Button>
-          </CardContent>
-        </Card>
+          </SwipeCard>
+        </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between">
-        <Button variant="outline" size="icon" aria-label="Önceki" disabled={index === 0} onClick={() => go(-1)}>
-          <FiChevronLeft />
-        </Button>
-        <div className="flex gap-1.5">
+      {!isSummary && (
+        <p className="text-center text-xs text-muted-foreground">
+          Sağa kaydır: biliyorum · Sola kaydır: henüz değil
+        </p>
+      )}
+
+      <div className="mt-auto flex flex-col gap-3">
+        {!isSummary && (
+          <div className="grid grid-cols-[auto_1fr_1fr] gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Geri al"
+              disabled={index === 0}
+              onClick={undo}
+            >
+              <FiRotateCcw />
+            </Button>
+            <Button variant="outline" onClick={() => cardRef.current?.swipe("left")}>
+              <FiX /> Henüz değil
+            </Button>
+            <Button onClick={() => cardRef.current?.swipe("right")}>
+              <FiCheck /> Biliyorum
+            </Button>
+          </div>
+        )}
+        {isSummary && index > 0 && (
+          <Button variant="ghost" size="sm" onClick={undo}>
+            <FiRotateCcw /> Son kartı geri al
+          </Button>
+        )}
+        <div className="flex justify-center gap-1.5">
           {words.map((w, i) => (
             <span
               key={w.id}
               className={cn(
                 "size-2 rounded-full bg-muted-foreground/30",
                 i === index && "bg-foreground",
-                known.has(w.id) && i !== index && "bg-primary/60",
+                known.has(w.id) && i !== index && "bg-success",
               )}
             />
           ))}
         </div>
-        <Button variant="outline" size="icon" aria-label="Sonraki" disabled={isSummary} onClick={() => go(1)}>
-          <FiChevronRight />
-        </Button>
       </div>
     </div>
   );
