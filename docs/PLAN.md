@@ -74,6 +74,13 @@ Kelime takibi desteler üzerinden yapılır.
 - Sorular düello oluşturulurken sunucuda seçilir. Doğru cevaplar istemciye gönderilmez. Kontrol sunucuda (Postgres fonksiyonu veya Route Handler) yapılır.
 - Canlı (Supabase Realtime) düello sonraya bırakılır. Free plan'da eşzamanlı ~200 bağlantı sınırı var.
 
+### Düello – uygulanan yapı
+- Rakip nickname ile bulunur. Sorular (10 adet, 4 şıklı) sunucuda `create_duel()` ile üretilir.
+- Cevap anahtarı `duel_answer_keys` tablosunda durur. RLS açık ve hiç policy yok, API'den okunamaz.
+- Skor sadece `submit_duel()` ile yazılır, doğrudan insert/update kapalı. Cevaplar sunucuda puanlanır.
+- Rakibin skoru, sen bitirene kadar gizlidir. Eşitlikte hızlı olan kazanır (süreyi istemci gönderir, bu yüzden tam güvenli değildir).
+- Maliyet notu: her düello 1 satır + 1 anahtar satırı. İleride bitmiş düelloları belirli süre sonra silen bir temizlik (pg_cron) eklenebilir.
+
 ## 4. Expo hazırlığı
 - Tekrar aralığı ve skor gibi iş mantığı UI'dan ayrı saf fonksiyonlar olarak yazılır, mobilde de kullanılır.
 - Veri her iki platformda aynı Supabase backend'inden gelir.
@@ -93,4 +100,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş: e-posta ve şifre (yazıldı). Kayıttan sonra benzersiz nickname seçilir (büyük/küçük harf duyarsız). Google girişi şimdilik ertelendi.
 4. Mobil öncelikli ana sayfa.
-5. Kelime desteleri, kart çalışma ekranı ve isteğe bağlı testler (boşluk doldurma, doğru/yanlış) yazıldı. Arayüz Türkçe. Sıradaki: genel pratik (öğrenilen tüm kelimelerden), gramer, düello, gerçek YDS listesi.
+5. Kelime desteleri, kart çalışma ekranı, testler, genel pratik, gramer ve düello yazıldı. Arayüz Türkçe. Sıradaki: gerçek YDS listesi, gramer için tekrar takvimi/testler, Expo.
