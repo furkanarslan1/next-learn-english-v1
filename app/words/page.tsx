@@ -15,12 +15,12 @@ export default function WordsPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 p-4">
       <header className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/" aria-label="Back" />}>
+        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/" aria-label="Geri" />}>
           <FiArrowLeft />
         </Button>
-        <h1 className="text-xl font-semibold">Learn words</h1>
+        <h1 className="text-xl font-semibold">Kelime öğren</h1>
       </header>
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Loading decks…</p>}>
+      <Suspense fallback={<p className="text-sm text-muted-foreground">Desteler yükleniyor…</p>}>
         <Decks />
       </Suspense>
     </main>
@@ -40,7 +40,7 @@ async function Decks() {
   ]);
 
   if (!decks?.length) {
-    return <p className="text-sm text-muted-foreground">No decks yet.</p>;
+    return <p className="text-sm text-muted-foreground">Henüz deste yok.</p>;
   }
 
   const activeByDeck = new Map((active ?? []).map((a) => [a.deck_id, a]));
@@ -78,22 +78,22 @@ async function Decks() {
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle>{deck.title}</CardTitle>
                   {isLearned ? (
-                    <Badge variant="secondary">Learned</Badge>
+                    <Badge variant="secondary">Öğrenildi</Badge>
                   ) : row ? (
                     <Badge variant={wait <= 0 ? "default" : "outline"}>
-                      {wait <= 0 ? "Review due" : `Next ${formatWait(wait)}`}
+                      {wait <= 0 ? "Tekrar zamanı" : `Sonraki: ${formatWait(wait)}`}
                     </Badge>
                   ) : null}
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
-                  <p className="text-sm text-muted-foreground">{total} words</p>
+                  <p className="text-sm text-muted-foreground">{total} kelime</p>
                   {row && <Progress value={total ? (knownCount / total) * 100 : 0} />}
                   {row ? (
-                    <Button nativeButton={false} render={<Link href={`/words/${deck.id}`} />}>Study</Button>
+                    <Button nativeButton={false} render={<Link href={`/words/${deck.id}`} />}>Çalış</Button>
                   ) : !isLearned ? (
                     <form action={startDeck.bind(null, deck.id)}>
                       <Button type="submit" className="w-full" disabled={limitReached}>
-                        {limitReached ? `Max ${MAX_ACTIVE_DECKS} active decks` : "Start deck"}
+                        {limitReached ? `En fazla ${MAX_ACTIVE_DECKS} aktif deste` : "Desteyi başlat"}
                       </Button>
                     </form>
                   ) : null}

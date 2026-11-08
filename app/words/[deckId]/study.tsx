@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { FiCheck, FiChevronLeft, FiChevronRight, FiVolume2 } from "react-icons/fi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,14 @@ type Word = {
 };
 
 const SWIPE_THRESHOLD = 50;
+
+const PART_OF_SPEECH_TR: Record<string, string> = {
+  noun: "isim",
+  verb: "fiil",
+  adjective: "sıfat",
+  adverb: "zarf",
+  "noun/verb": "isim/fiil",
+};
 
 export function Study({
   deckId,
@@ -67,33 +76,52 @@ export function Study({
 
       {!isDue && (
         <p className="text-sm text-muted-foreground">
-          Not due yet. This is extra practice and won&apos;t move your schedule.
+          Henüz tekrar zamanı gelmedi. Bu ekstra pratik, tekrar takvimini ilerletmez.
         </p>
       )}
 
       {isSummary ? (
         <Card>
           <CardContent className="flex flex-col gap-4">
-            <h2 className="text-lg font-semibold">Session complete</h2>
+            <h2 className="text-lg font-semibold">Oturum tamamlandı</h2>
             <p className="text-sm text-muted-foreground">
-              {known.size} word{known.size === 1 ? "" : "s"} marked as known.
+              {known.size} kelime &quot;biliyorum&quot; olarak işaretlendi.
             </p>
             <Button
               disabled={pending}
               onClick={() => startTransition(() => completeSession(deckId, [...known]))}
             >
-              Finish session
+              Oturumu bitir
             </Button>
             <Button
               variant="outline"
               disabled={pending}
               onClick={() => startTransition(() => learnDeck(deckId))}
             >
-              I learned this deck
+              Desteyi öğrendim
             </Button>
             <Button variant="ghost" disabled={pending} onClick={() => setIndex(0)}>
-              Review again
+              Kartları tekrar gez
             </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                nativeButton={false}
+                render={<Link href={`/words/${deckId}/test/fill`} />}
+              >
+                Boşluk doldurma
+              </Button>
+              <Button
+                variant="secondary"
+                nativeButton={false}
+                render={<Link href={`/words/${deckId}/test/tf`} />}
+              >
+                Doğru / Yanlış
+              </Button>
+            </div>
+            <p className="text-center text-xs text-muted-foreground">
+              Testler isteğe bağlıdır.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -114,14 +142,14 @@ export function Study({
                 <p className="text-3xl font-bold">{word.english}</p>
                 {word.part_of_speech && (
                   <Badge variant="outline" className="mt-2">
-                    {word.part_of_speech}
+                    {PART_OF_SPEECH_TR[word.part_of_speech] ?? word.part_of_speech}
                   </Badge>
                 )}
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label="Pronounce"
+                aria-label="Telaffuz"
                 onClick={() => speak(word.english)}
               >
                 <FiVolume2 />
@@ -150,14 +178,14 @@ export function Study({
               variant={known.has(word.id) ? "default" : "outline"}
               onClick={() => toggleKnown(word.id)}
             >
-              <FiCheck /> {known.has(word.id) ? "Marked as known" : "I know this"}
+              <FiCheck /> {known.has(word.id) ? "Biliyorum olarak işaretlendi" : "Biliyorum"}
             </Button>
           </CardContent>
         </Card>
       )}
 
       <div className="mt-auto flex items-center justify-between">
-        <Button variant="outline" size="icon" aria-label="Previous" disabled={index === 0} onClick={() => go(-1)}>
+        <Button variant="outline" size="icon" aria-label="Önceki" disabled={index === 0} onClick={() => go(-1)}>
           <FiChevronLeft />
         </Button>
         <div className="flex gap-1.5">
@@ -172,7 +200,7 @@ export function Study({
             />
           ))}
         </div>
-        <Button variant="outline" size="icon" aria-label="Next" disabled={isSummary} onClick={() => go(1)}>
+        <Button variant="outline" size="icon" aria-label="Sonraki" disabled={isSummary} onClick={() => go(1)}>
           <FiChevronRight />
         </Button>
       </div>

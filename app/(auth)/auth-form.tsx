@@ -24,17 +24,17 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>{isLogin ? "Welcome back" : "Create your account"}</CardTitle>
+        <CardTitle>{isLogin ? "Tekrar hoş geldin" : "Hesap oluştur"}</CardTitle>
         <CardDescription>
           {isLogin
-            ? "Log in to continue learning."
-            : "Start building your vocabulary."}
+            ? "Öğrenmeye devam etmek için giriş yap."
+            : "Kelime hazneni geliştirmeye başla."}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={action} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-posta</Label>
             <Input
               id="email"
               name="email"
@@ -44,7 +44,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Şifre</Label>
             <Input
               id="password"
               name="password"
@@ -63,16 +63,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {state?.message && <p className="text-sm">{state.message}</p>}
 
           <Button type="submit" disabled={pending}>
-            {pending ? "Please wait…" : isLogin ? "Log in" : "Sign up"}
+            {pending ? "Lütfen bekle…" : isLogin ? "Giriş yap" : "Kayıt ol"}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            {isLogin ? "No account yet? " : "Already have an account? "}
+            {isLogin ? "Hesabın yok mu? " : "Zaten hesabın var mı? "}
             <Link
               href={isLogin ? "/signup" : "/login"}
               className="underline underline-offset-4"
             >
-              {isLogin ? "Sign up" : "Log in"}
+              {isLogin ? "Kayıt ol" : "Giriş yap"}
             </Link>
           </p>
         </form>

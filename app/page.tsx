@@ -15,21 +15,21 @@ import { createClient } from "@/lib/supabase/server";
 import { signout } from "./(auth)/actions";
 
 const sections = [
-  { href: "/words", title: "Learn words", description: "Study your word decks.", icon: FiBookOpen },
-  { href: "/grammar", title: "Study grammar", description: "Rules and examples by level.", icon: MdOutlineSpellcheck },
-  { href: "/duels", title: "Duel", description: "Challenge other learners.", icon: FiZap },
+  { href: "/words", title: "Kelime öğren", description: "Kelime desteni çalış.", icon: FiBookOpen },
+  { href: "/grammar", title: "Gramer çalış", description: "Seviyeye göre kurallar ve örnekler.", icon: MdOutlineSpellcheck },
+  { href: "/duels", title: "Düello", description: "Diğer öğrencilere meydan oku.", icon: FiZap },
 ];
 
 export default function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 p-4">
       <header className="flex items-center justify-between">
-        <Suspense fallback={<h1 className="text-xl font-semibold">Welcome</h1>}>
+        <Suspense fallback={<h1 className="text-xl font-semibold">Hoş geldin</h1>}>
           <Greeting />
         </Suspense>
         <form action={signout}>
           <Button variant="outline" size="sm" type="submit">
-            <FiLogOut /> Log out
+            <FiLogOut /> Çıkış yap
           </Button>
         </form>
       </header>
@@ -63,5 +63,5 @@ async function Greeting() {
   // Signed in with Google but no nickname yet.
   if (!profile?.username) redirect("/onboarding");
 
-  return <h1 className="text-xl font-semibold">Welcome, {profile.username}</h1>;
+  return <h1 className="text-xl font-semibold">Hoş geldin, {profile.username}</h1>;
 }

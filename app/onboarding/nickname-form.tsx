@@ -26,8 +26,8 @@ export function NicknameForm() {
           required
         />
         <p className="text-xs text-muted-foreground">
-          3-20 characters: letters, numbers and underscores. Other players will
-          see this name.
+          3-20 karakter: harf, rakam ve alt çizgi. Diğer oyuncular bu ismi
+          görecek.
         </p>
       </div>
       {state?.error && (
@@ -36,7 +36,7 @@ export function NicknameForm() {
         </p>
       )}
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Continue"}
+        {pending ? "Kaydediliyor…" : "Devam et"}
       </Button>
     </form>
   );

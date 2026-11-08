@@ -93,4 +93,4 @@ Kelime takibi desteler üzerinden yapılır.
 2. Şema: `supabase/migrations` altında (yazıldı, Supabase projesine uygulanacak).
 3. Giriş: e-posta ve şifre (yazıldı). Kayıttan sonra benzersiz nickname seçilir (büyük/küçük harf duyarsız). Google girişi şimdilik ertelendi.
 4. Mobil öncelikli ana sayfa.
-5. Kelime desteleri ve kart çalışma ekranı (yazıldı). Sıradaki: isteğe bağlı testler (boşluk doldurma, doğru/yanlış), gerçek kelime listeleri.
+5. Kelime desteleri, kart çalışma ekranı ve isteğe bağlı testler (boşluk doldurma, doğru/yanlış) yazıldı. Arayüz Türkçe. Sıradaki: genel pratik (öğrenilen tüm kelimelerden), gramer, düello, gerçek YDS listesi.

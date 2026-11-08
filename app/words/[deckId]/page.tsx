@@ -12,11 +12,11 @@ export default function DeckPage({ params }: PageProps<"/words/[deckId]">) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4">
       <header className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/words" aria-label="Back" />}>
+        <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/words" aria-label="Geri" />}>
           <FiArrowLeft />
         </Button>
       </header>
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Loading cards…</p>}>
+      <Suspense fallback={<p className="text-sm text-muted-foreground">Kartlar yükleniyor…</p>}>
         <Deck params={params} />
       </Suspense>
     </main>
